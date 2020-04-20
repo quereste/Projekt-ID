@@ -21,7 +21,7 @@ poczatek_produkcji numeric(4),
 koniec_produkcji numeric(4),
 CHECK (poczatek_produkcji<=koniec_produkcji),
 CHECK (segment IN ('A','B','C','D','E','F','S','M','J')),
-UNIQUE (model, marka)
+UNIQUE (model, id_marka)
 );
 
 //klasa np. samochód terenowy, dostawczy
@@ -44,7 +44,7 @@ klimatyzacja char(3) CHECK(klimatyzacja='TAK' OR klimatyzacja='NIE'),
 skrzynia_biegow varchar(20) CHECK(skrzynia_biegow='automatyczna' OR skrzynia_biegow='manualna'),
 typ_nadwozia varchar(30),
 zuzycie_paliwa numeric(2),
-CHECK(silnik IN('benzyna','diesel','hybryda','gaz','elektryczny'),
+CHECK(silnik IN('benzyna','diesel','hybryda','gaz','elektryczny')
 );
 
 CREATE TABLE zarzad(
@@ -62,7 +62,8 @@ kod_pocztowy,
 adres,
 numer_telefonu numeric(11),
 godziny oraz dni otwarcia,
-id_kierownika numeric(2) REFERENCES zarzad
+id_kierownika numeric(2) REFERENCES zarzad,
+tylko_nowe char(3) CHECK(tylko_nowe='TAK' OR tylko_nowe='NIE')
 );
 
 CREATE TABLE salon_samochody
