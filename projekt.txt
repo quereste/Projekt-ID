@@ -1,0 +1,91 @@
+CREATE TABLE marki (
+id_marka numeric(2) PRIMARY KEY,
+nazwa_marka varchar(20) NOT NULL,
+kraj varchar(40) NOT NULL
+);
+
+CREATE TABLE modele
+(
+id_model numeric(4) PRIMARY KEY,
+model varchar(20) NOT NULL,
+id_marka numeric(2) REFERENCES marki,
+predkosc_max numeric(3),
+masa numeric(6),
+klasa varchar(20),
+bagaznik numeric(3),
+zbiornik_paliwa numeric(3),
+rodzaj_napedu varchar(50),
+segment char(1),
+liczba_miejsc numeric(2),
+poczatek_produkcji numeric(4),
+koniec_produkcji numeric(4),
+CHECK (poczatek_produkcji<=koniec_produkcji),
+CHECK (segment IN ('A','B','C','D','E','F','S','M','J')),
+UNIQUE (model, marka)
+);
+
+//klasa np. samochód terenowy, dostawczy
+//bagaznik - pojemnosc w litrach
+
+CREATE TABLE samochody
+(
+id_samochodu numeric(10) PRIMARY KEY,
+id_model numeric(4) REFERENCES modele,
+rok_produkcji numeric(4) NOT NULL,
+cena numeric(10,2),
+nowy char(3) CHECK(nowy='TAK' OR nowy='NIE'),
+silnik varchar(20),
+przebieg numeric(10),
+silnik_moc_KM numeric(3),
+silnik_moc_kW numeric(3),
+pojemnoœæ_silnika numeric(4),
+kolor varchar(20),
+klimatyzacja char(3) CHECK(klimatyzacja='TAK' OR klimatyzacja='NIE'),
+skrzynia_biegow varchar(20) CHECK(skrzynia_biegow='automatyczna' OR skrzynia_biegow='manualna'),
+typ_nadwozia varchar(30),
+zuzycie_paliwa numeric(2),
+CHECK(silnik IN('benzyna','diesel','hybryda','gaz','elektryczny'),
+);
+
+CREATE TABLE zarzad(
+	id_kierownika numeric(2) PRIMARY KEY,
+	imie varchar (20),
+	nazwisko varchar (30),
+	telefon numeric (9) NOT NULL
+);
+
+CREATE TABLE salon
+(
+salon_id numeric(4) PRIMARY KEY,
+miasto,
+kod_pocztowy,
+adres,
+numer_telefonu numeric(11),
+godziny oraz dni otwarcia,
+id_kierownika numeric(2) REFERENCES zarzad
+);
+
+CREATE TABLE salon_samochody
+(
+salon_id numeric(4) REFERENCES salon,
+id_samochodu numeric(10) REFERENCES samochody
+);
+
+
+
+
+
+
+//zarz¹d na razie tworz¹ ka¿dorazowi kierownicy salonów 
+//salon_samochody pamiêta informacje o tym w którym salonie jest który samochód
+//samochód to jakiœ konkretny pojazd, ka¿dy jest unikalnym obiektem
+//modele to ogólna kategoria, ró¿ni siê od tabeli samochod tym ¿e mo¿e byæ wiele samochodów o tym samym id_modelu, ale ka¿dy jest ró¿ny (np. cena)
+
+
+//kolejnoœæ usuwania jest wa¿na, bo tabele s¹ od siebie zale¿ne
+DROP TABLE salon_samochody;
+DROP TABLE samochody;
+DROP TABLE salon;
+DROP TABLE modele;
+DROP TABLE marki;
+DROP TABLE zarzad;
