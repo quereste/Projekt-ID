@@ -27,14 +27,24 @@ UNIQUE (model, id_marka)
 //klasa np. samochód terenowy, dostawczy
 //bagaznik - pojemnosc w litrach
 
+CREATE TABLE klienci_salonu
+(
+id_klienta numeric(6) PRIMARY KEY,
+imie varchar(20),
+nazwisko varchar(30),
+telefon numeric(9) NOT NULL,
+email varchar(50)
+);
+
 CREATE TABLE samochody
 (
 id_samochodu numeric(10) PRIMARY KEY,
 id_model numeric(4) REFERENCES modele,
+id_wlasciciel numeric(6) REFERENCES klienci_salonu, 
 rok_produkcji numeric(4) NOT NULL,
 cena numeric(10,2),
 nowy char(3) CHECK(nowy='TAK' OR nowy='NIE'),
-silnik varchar(20),
+silnik varchar(20) CHECK(silnik IN('benzyna','diesel','hybryda','gaz','elektryczny')),
 przebieg numeric(10),
 silnik_moc_KM numeric(3),
 silnik_moc_kW numeric(3),
@@ -43,9 +53,10 @@ kolor varchar(20),
 klimatyzacja char(3) CHECK(klimatyzacja='TAK' OR klimatyzacja='NIE'),
 skrzynia_biegow varchar(20) CHECK(skrzynia_biegow='automatyczna' OR skrzynia_biegow='manualna'),
 typ_nadwozia varchar(30),
-zuzycie_paliwa numeric(2),
-CHECK(silnik IN('benzyna','diesel','hybryda','gaz','elektryczny')
+zuzycie_paliwa numeric(2)
 );
+
+//id_wlasciciel to poprzedni wlasciciel ktory sprzedal samochod salonowi
 
 CREATE TABLE zarzad(
 	id_kierownika numeric(2) PRIMARY KEY,
@@ -57,23 +68,21 @@ CREATE TABLE zarzad(
 CREATE TABLE salon
 (
 salon_id numeric(4) PRIMARY KEY,
-miasto,
-kod_pocztowy,
-adres,
-numer_telefonu numeric(11),
-godziny oraz dni otwarcia,
+miasto varchar(50) NOT NULL,
+kod_pocztowy char(6),
+adres varchar(50),
+numer_telefonu numeric(9),
 id_kierownika numeric(2) REFERENCES zarzad,
 tylko_nowe char(3) CHECK(tylko_nowe='TAK' OR tylko_nowe='NIE')
 );
+
+//dodaæ godziny oraz dni otwarcia salonu
 
 CREATE TABLE salon_samochody
 (
 salon_id numeric(4) REFERENCES salon,
 id_samochodu numeric(10) REFERENCES samochody
 );
-
-
-
 
 
 
@@ -90,3 +99,4 @@ DROP TABLE salon;
 DROP TABLE modele;
 DROP TABLE marki;
 DROP TABLE zarzad;
+DROP TABLE klienci_salonu;
