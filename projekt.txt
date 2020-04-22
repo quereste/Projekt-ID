@@ -9,7 +9,7 @@ CREATE TABLE marki
 	UNIQUE (nazwa)
 );
 
-insert into marki (id_marka, nazwa, nazwa_koncernu) values 
+insert into marki (id_marka, nazwa, nazwa_koncernu,panstwo) values 
 (1,'Audi','Volkswagen AG'),
 	(2,'BMW','Bayerische Motoren Werke AG'),
 	(3,'Fiat','Fiat Chrysler Automobiles'),
@@ -36,7 +36,6 @@ CREATE TABLE modele
 	id_model numeric(4) PRIMARY KEY,
 	model varchar(50) NOT NULL,
 	masa_min numeric(6),
-	typ varchar(50),
 	zbiornik_paliwa numeric(3),
 	segment char(1) NOT NULL,
 	poczatek_produkcji numeric(4),
@@ -46,33 +45,72 @@ CREATE TABLE modele
 	CHECK (segment IN ('A','B','C','D','E','F','S','M','J')),
 	UNIQUE (model, id_marka)
 );
-
+--nadal produkowane, tylko one moga byc jako nowe w samochodach
 insert into modele (id_marka,id_model,model,segment,poczatek_produkcji,
-zbiornik_paliwa,masa_min,typ) values 
-(2,1,'X1 II','C',2015,51,1470,'crossover'),
-(7,10,'IS III','D',2013,66,1550,'sedan'),
-(7,11,'GS IV','E',2012,71,1721,'sedan')
+zbiornik_paliwa,masa_min) values 
+(2,1,'X1 II','C',2015,51,1470),
+(7,10,'IS III','D',2013,66,1550),
+(7,11,'GS IV','E',2012,71,1721),
+(11,6,'Panamera II','F',2016,75,1945),
+(16,13,'Corolla XII','C',2018,50,1295)
 	;
-
-insert into modele (id_marka,id_model,model,segment,poczatek_produkcji,koniec_produkcji,
-zbiornik_paliwa,masa_min,typ) values 
-(2,2,'X3 I','D',2003,2010,67,1755,'SUV'),
-(2,3,'X4 I','D',2014,2018,67,1815,'SUV'),
-(2,4,'X5 II','E',2006,2013,85,2105,'SUV'),
-(2,5,'X6 I','E',2007,2014,85,2100,'SUV'),
-(11,6,'Panamera I','F',2009,2016,75,1945,'fastback'),
-(12,7,'Toledo III','C',2004,2009,55,1344,'minivan')
-	;
-
+--produkcja zakonczona
 insert into modele (id_marka,id_model,model,segment,poczatek_produkcji,koniec_produkcji,
 zbiornik_paliwa,masa_min) values 
+(2,2,'X3 I','D',2003,2010,67,1755),
+(2,3,'X4 I','D',2014,2018,67,1815),
+(2,4,'X5 II','E',2006,2013,85,2105),
+(2,5,'X6 I','E',2007,2014,85,2100),
+(12,7,'Toledo III','C',2004,2009,55,1344),
 (12,8,'Ibiza I','B',1984,1993,50,840),
 (12,9,'Ibiza IV','B',2008,2017,45,974),
 (11,12,'Cayman I','C',2005,2012,64,1295)
 	;
 
---typ np. samochód terenowy, dostawczy
---bagaznik - pojemnosc w litrach
+drop table if exists typ cascade;
+CREATE TABLE typ
+(
+	id_typ numeric(2) PRIMARY KEY,
+	nazwa varchar(30) UNIQUE
+);
+
+insert into typ(id_typ, nazwa) values
+(1,'SUV'),
+(2,'crossover'),
+(3,'sedan'),
+(4,'minivan'),
+(5,'fastback'),
+(6,'hatchback'),
+(7,'kombi'),
+(8,'liftback'),
+(9,'kabriolet'),
+(10,'van'),
+(11,'coupe'),
+(12,'roadster')
+	;
+
+drop table if exists modele_typ cascade;
+CREATE TABLE modele_typ
+(
+	id_typ numeric(2) REFERENCES typ,
+	id_model numeric(4) REFERENCES modele
+);
+
+insert into modele_typ(id_model,id_typ) values
+(1,2),
+(2,1),
+(3,1),
+(4,1),
+(5,1),
+(6,5),(6,7),
+(7,4),
+(8,6),
+(9,6),(9,7),
+(10,3),
+(11,3),
+(12,11),(12,11),
+(13,6),(13,7),(13,3)
+	;
 
 drop table if exists wyposazenie cascade;
 CREATE TABLE wyposazenie
@@ -128,7 +166,7 @@ drop table if exists rodzaj_napedu cascade;
 CREATE TABLE rodzaj_napedu
 (
 	id_naped numeric(2) PRIMARY KEY,
-	nazwa varchar(20)
+	nazwa varchar(20) UNIQUE
 );
 
 insert into rodzaj_napedu (id_naped,nazwa) values 
@@ -158,7 +196,8 @@ insert into modele_naped (id_model,id_naped) values
 (9,2),
 (10,3),
 (11,1),(11,3),
-(12,3)
+(12,3),
+(13,2)
 	;
 
 
@@ -182,7 +221,9 @@ insert into kraje(id_kraju,nazwa) values
 (10,'Austria'),
 (11,'Hiszpania'),
 (12,'Japonia'),
-(13,'Finlandia')
+(13,'Finlandia'),
+(14,'Anglia'),
+(15,'Turcja')
 	;
 
 drop table if exists modele_kraje cascade;
@@ -206,7 +247,8 @@ insert into modele_kraje(id_model,id_kraju) values
 (9,11),
 (10,12),
 (11,12),
-(12,13),(12,2)
+(12,13),(12,2),
+(13,12),(13,14),(13,15)
 	;
 
 drop table if exists klienci_salonu cascade;
@@ -238,13 +280,14 @@ CREATE TABLE samochody
 	przebieg numeric(10),
 	silnik_moc_KM numeric(3),
 	silnik_moc_kW numeric(3),
-	pojemnoœæ_silnika numeric(4),
+	--pojemnoœæ_silnika numeric(4),
 	kolor varchar(20) NOT NULL,
 	skrzynia_biegow varchar(50),
 	spalanie numeric(3,1),
 	bezwypadkowy char(3),
 	predkosc_max numeric(3),
 	liczba_biegow numeric(2),
+	id_typ numeric(2) REFERENCES typ,
 
 	CHECK(nowy='TAK' OR nowy='NIE'),
 	CHECK(bezwypadkowy='TAK' OR bezwypadkowy='NIE'),
@@ -256,16 +299,22 @@ CREATE TABLE samochody
 
 insert into samochody (id_model,id_samochodu,cena,nowy,liczba_drzwi,kolor,id_wyposazenie,
 rok_produkcji,liczba_miejsc,id_naped,silnik,spalanie,skrzynia_biegow,liczba_biegow,
-silnik_moc_KM,predkosc_max) values 
-(1,1,159100,'TAK',5,'niebieski',1,2018,5,2,'benzyna',5.9,'manualna',6,192,225),
-(6,4,515740,'TAK',4,'niebieski',7,2019,4,3,'diesel',6.8,'automatyczna',8,422,285)
+silnik_moc_KM,predkosc_max,id_typ) values 
+(1,1,159100,'TAK',5,'niebieski',1,2018,5,2,'benzyna',5.9,'manualna',6,192,225,2),
+(6,4,515740,'TAK',4,'niebieski',7,2019,4,3,'diesel',6.8,'automatyczna',8,422,285,5)
 	;
-
+--bez wyposazenia
+insert into samochody (id_model,id_samochodu,cena,nowy,liczba_drzwi,kolor,
+rok_produkcji,liczba_miejsc,id_naped,silnik,spalanie,skrzynia_biegow,liczba_biegow,
+silnik_moc_KM,predkosc_max,id_typ) values 
+(13,5,59600,'TAK',5,'srebrny',2020,5,2,'diesel',3.5,'manualna',6,90,175,7)
+	;
+--bez liczby biegow
 insert into samochody (id_model,id_samochodu,cena,nowy,liczba_drzwi,kolor,id_wyposazenie,
 rok_produkcji,liczba_miejsc,id_naped,silnik,spalanie,skrzynia_biegow,
-silnik_moc_KM,predkosc_max) values 
-(10,2,199000,'TAK',4,'czarny',14,2016,5,3,'hybryda',4.2,'CVT',223,200),
-(11,3,291900,'TAK',4,'srebrny',13,2017,5,1,'hybryda',5.9,'CVT',345,250)
+silnik_moc_KM,predkosc_max,id_typ) values 
+(10,2,199000,'TAK',4,'czarny',14,2018,5,3,'hybryda',4.2,'CVT',223,200,3),
+(11,3,291900,'TAK',4,'srebrny',13,2019,5,1,'hybryda',5.9,'CVT',345,250,3)
 	;
 --id_wlasciciel to poprzedni wlasciciel ktory sprzedal samochod salonowi
 
@@ -294,7 +343,7 @@ CREATE TABLE salon
 --dodaæ godziny oraz dni otwarcia salonu
 
 insert into salon (salon_id, miasto) values 
-	(1,'Krakow'),
+(1,'Krakow'),
 	(2,'Poznan'),
 	(3,'Warszawa'),
 	(4,'Opole'),
@@ -328,15 +377,17 @@ DROP TABLE rodzaj_napedu;
 DROP TABLE model_naped;
 
 --wypisuje pary marka, model
-select nazwa_marka,model from modele join marki using(id_marka);
+select nazwa,model from modele left outer join marki using(id_marka) order by 1,2;
 --wypisuje modele i dostepne wyposazenia
 Select model,w.nazwa from wyposazenie w join modele_wyposazenie using(id_wyposazenie) join modele using(id_model);
 --modele i kraje produkcji
 Select model,w.nazwa from kraje w join modele_kraje using(id_kraju) join modele using(id_model);
 --modele i rodzaj napedu
 select model,w.nazwa from rodzaj_napedu w join modele_naped using(id_naped) join modele using(id_model);
+--modele i typ nadwozia
+select model,w.nazwa from typ w join modele_typ using(id_typ) join modele using(id_model);
 --dostepne modele w salonach
-select m.nazwa, model,silnik,nowy,kolor,w.nazwa,n.nazwa,rok_produkcji,cena,typ from samochody join modele using(id_model) join marki m using(id_marka) join wyposazenie w using(id_wyposazenie) join rodzaj_napedu n using(id_naped);
+select m.nazwa, model,silnik,nowy,kolor,w.nazwa,n.nazwa,rok_produkcji,cena,t.nazwa from samochody left outer join modele using(id_model) left outer join marki m using(id_marka) left outer join wyposazenie w using(id_wyposazenie) left outer join rodzaj_napedu n using(id_naped) left outer join typ t using(id_typ);
 
 
 
