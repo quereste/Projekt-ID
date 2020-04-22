@@ -9,7 +9,7 @@ CREATE TABLE marki
 	UNIQUE (nazwa)
 );
 
-insert into marki (id_marka, nazwa, nazwa_koncernu,panstwo) values 
+insert into marki (id_marka, nazwa, nazwa_koncernu) values 
 (1,'Audi','Volkswagen AG'),
 	(2,'BMW','Bayerische Motoren Werke AG'),
 	(3,'Fiat','Fiat Chrysler Automobiles'),
