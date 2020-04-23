@@ -1,0 +1,13 @@
+--wypisuje pary marka, model
+select nazwa,model from modele left outer join marki using(id_marka) order by 1,2;
+--wypisuje modele i dostepne wyposazenia
+Select model,w.nazwa from wyposazenie w join modele_wyposazenie using(id_wyposazenie) join modele using(id_model);
+--modele i kraje produkcji
+Select model,w.nazwa from kraje w join modele_kraje using(id_kraju) join modele using(id_model);
+--modele i rodzaj napedu
+select model,w.nazwa from rodzaj_napedu w join modele_naped using(id_naped) join modele using(id_model);
+--modele i typ nadwozia
+select model,w.nazwa from typ w join modele_typ using(id_typ) join modele using(id_model);
+--dostepne modele w salonach
+select m.nazwa, model,silnik,nowy,kolor,w.nazwa,n.nazwa,rok_produkcji as "rok",cena,t.nazwa,skrzynia_biegow from samochody left outer join modele using(id_model) left outer join marki m using(id_marka) left outer join wyposazenie w using(id_wyposazenie) left outer join rodzaj_napedu n using(id_naped) left outer join typ t using(id_typ);
+
