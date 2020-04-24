@@ -31,7 +31,7 @@ insert into marki (id_marka, nazwa, nazwa_koncernu) values
 drop table if exists modele cascade;
 CREATE TABLE modele
 (
-	id_marka numeric(4) REFERENCES marki,
+	id_marka numeric(4) REFERENCES marki NOT NULL,
 	id_model numeric(4) PRIMARY KEY,
 	model varchar(50) NOT NULL,
 	masa_min numeric(6),
@@ -75,7 +75,9 @@ drop table if exists typ cascade;
 CREATE TABLE typ
 (
 	id_typ numeric(2) PRIMARY KEY,
-	nazwa varchar(30) UNIQUE
+	nazwa varchar(30) UNIQUE,
+
+	CHECK(nazwa IS NOT NULL)
 );
 
 insert into typ(id_typ, nazwa) values
@@ -97,7 +99,9 @@ drop table if exists modele_typ cascade;
 CREATE TABLE modele_typ
 (
 	id_typ numeric(2) REFERENCES typ,
-	id_model numeric(4) REFERENCES modele
+	id_model numeric(4) REFERENCES modele,
+
+	PRIMARY KEY (id_typ,id_model)
 );
 
 insert into modele_typ(id_model,id_typ) values
@@ -123,7 +127,7 @@ CREATE TABLE wyposazenie
 (
 	id_wyposazenie numeric(4) PRIMARY KEY,
 	id_marka numeric(3) REFERENCES marki,
-	nazwa varchar(50)
+	nazwa varchar(50) NOT NULL
 );
 
 insert into wyposazenie(id_wyposazenie,id_marka,nazwa) values 
@@ -154,7 +158,7 @@ CREATE TABLE modele_wyposazenie
 	id_wyposazenie numeric(4) REFERENCES wyposazenie,
 	id_model numeric(4) REFERENCES modele,
 
-	 PRIMARY KEY (id_wyposazenie,id_model)
+	PRIMARY KEY (id_wyposazenie,id_model)
 );
 
 insert into modele_wyposazenie(id_model,id_wyposazenie) values 
@@ -176,7 +180,9 @@ drop table if exists rodzaj_napedu cascade;
 CREATE TABLE rodzaj_napedu
 (
 	id_naped numeric(2) PRIMARY KEY,
-	nazwa varchar(20) UNIQUE
+	nazwa varchar(20) UNIQUE,
+
+	CHECK(nazwa IS NOT NULL)
 );
 
 insert into rodzaj_napedu (id_naped,nazwa) values 
@@ -216,7 +222,9 @@ drop table if exists kraje cascade;
 CREATE TABLE kraje
 (
 	id_kraju numeric(3) PRIMARY KEY,
-	nazwa varchar(50) UNIQUE
+	nazwa varchar(50) UNIQUE,
+
+	CHECK(nazwa IS NOT NULL)
 );
 
 insert into kraje(id_kraju,nazwa) values 
@@ -264,89 +272,26 @@ insert into modele_kraje(id_model,id_kraju) values
 (15,2)
 	;
 
-drop table if exists klienci_salonu cascade;
-CREATE TABLE klienci_salonu
-(
-	id_klienta numeric(6) PRIMARY KEY,
-	imie varchar(20),
-	nazwisko varchar(30),
-	telefon varchar(25),
-	email varchar(50),
-
-	CHECK (telefon IS NOT NULL OR email IS NOT NULL)
-);
-
-drop table if exists samochody cascade;
-CREATE TABLE samochody
-(
-	id_samochodu numeric(10) PRIMARY KEY,
-	id_model numeric(4) REFERENCES modele,
-	id_wlasciciel numeric(6) REFERENCES klienci_salonu, 
-	id_wyposazenie numeric(4) REFERENCES wyposazenie,
-	rok_produkcji numeric(4) NOT NULL,
-	cena numeric(10,2) NOT NULL,
-	nowy char(3) NOT NULL,
-	liczba_miejsc numeric(2),
-	liczba_drzwi numeric(2),
-	id_naped numeric(2) REFERENCES rodzaj_napedu,
-	silnik varchar(20) NOT NULL,
-	przebieg numeric(10),
-	silnik_moc_KM numeric(3),
-	silnik_moc_kW numeric(3),
-	pojemnosc_silnika numeric(4),
-	kolor varchar(20) NOT NULL,
-	skrzynia_biegow varchar(50),
-	spalanie numeric(3,1),
-	bezwypadkowy char(3),
-	predkosc_max numeric(3),
-	liczba_biegow numeric(2),
-	id_typ numeric(2) REFERENCES typ,
-	przyspieszenie numeric(3,1),
-
-	CHECK((nowy='TAK' AND przebieg is null) OR (nowy='NIE' AND przebieg is distinct from NULL)),
-	CHECK(bezwypadkowy='TAK' OR bezwypadkowy='NIE'),
-	CHECK(silnik IN('benzyna','diesel','hybryda','gaz','elektryczny')),
-	CHECK(skrzynia_biegow='automatyczna' OR skrzynia_biegow='manualna' OR skrzynia_biegow='CVT'),
-	CHECK((nowy='TAK' AND id_wlasciciel is NULL AND bezwypadkowy is NULL) OR (nowy='NIE' AND id_wlasciciel is distinct from NULL AND bezwypadkowy is distinct from NULL)),
-	CHECK((silnik_moc_KM is distinct from NULL AND silnik_moc_kW is distinct from NULL AND silnik_moc_kW<silnik_moc_KM) OR (silnik_moc_KM is distinct from NULL OR silnik_moc_kW is distinct from NULL))
-);
-
-insert into samochody (id_model,id_samochodu,cena,nowy,liczba_drzwi,kolor,id_wyposazenie,
-rok_produkcji,liczba_miejsc,id_naped,silnik,spalanie,skrzynia_biegow,liczba_biegow,
-silnik_moc_KM,predkosc_max,id_typ,przyspieszenie) values 
-(1,1,159100,'TAK',5,'niebieski',1,2018,5,2,'benzyna',5.9,'manualna',6,192,225,2,7.7),
-(6,4,543540,'TAK',4,'niebieski',7,2019,4,3,'diesel',6.8,'automatyczna',8,422,285,5,4.5)
-	;
---bez wyposazenia
-insert into samochody (id_model,id_samochodu,cena,nowy,liczba_drzwi,kolor,
-rok_produkcji,liczba_miejsc,id_naped,silnik,spalanie,skrzynia_biegow,liczba_biegow,
-silnik_moc_KM,predkosc_max,id_typ) values 
-(13,5,59600,'TAK',5,'srebrny',2020,5,2,'diesel',3.5,'manualna',6,90,175,7)
-	;
---bez liczby biegow
-insert into samochody (id_model,id_samochodu,cena,nowy,liczba_drzwi,kolor,id_wyposazenie,
-rok_produkcji,liczba_miejsc,id_naped,silnik,spalanie,skrzynia_biegow,
-silnik_moc_KM,predkosc_max,id_typ) values 
-(10,2,199000,'TAK',4,'czarny',14,2018,5,3,'hybryda',4.2,'CVT',223,200,3),
-(11,3,291900,'TAK',4,'srebrny',13,2019,5,1,'hybryda',5.9,'CVT',345,250,3)
-	;
-
---KM i kw (wyzej tylko KM)
-insert into samochody (id_model,id_samochodu,cena,nowy,liczba_drzwi,kolor,id_wyposazenie,
-rok_produkcji,liczba_miejsc,id_naped,silnik,spalanie,silnik_moc_kW,
-silnik_moc_KM,predkosc_max,id_typ,przyspieszenie) values 
-(14,6,159000,'TAK',4,'niebieski',14,2020,4,3,'elektryczny',0,125,170,150,6,7.3),
-(15,7,617136,'TAK',4,'bialy',8,2020,4,1,'elektryczny',0,460,625,260,3,3.2)
-	;
-
---id_wlasciciel to poprzedni wlasciciel ktory sprzedal samochod salonowi
-
 drop table if exists zarzad cascade;
 CREATE TABLE zarzad(
 	id_kierownika numeric(2) PRIMARY KEY,
 	imie varchar (20) NOT NULL,
 	nazwisko varchar (30) NOT NULL,
 	telefon varchar (25) NOT NULL
+);
+
+drop table if exists klienci_salonu cascade;
+CREATE TABLE klienci_salonu
+(
+	id_klienta numeric(6) PRIMARY KEY,
+	imie varchar(20),
+	nazwisko varchar(30),
+	nazwa varchar(100),
+	telefon varchar(25),
+	email varchar(50),
+
+	CHECK (telefon IS NOT NULL OR email IS NOT NULL),
+	CHECK((imie IS NOT NULL AND nazwisko IS NOT NULL) OR nazwa IS NOT NULL)
 );
 
 drop table if exists salon cascade;
@@ -357,7 +302,7 @@ CREATE TABLE salon
 	kod_pocztowy char(6),
 	adres varchar(50),
 	telefon varchar(25),
-	id_kierownika numeric(2) REFERENCES zarzad,
+	id_kierownika numeric(2) REFERENCES zarzad NOT NULL,
 	tylko_nowe char(3), 
 	otwarte_pon char(3),
 	otwarcie_pon time,
@@ -415,17 +360,76 @@ insert into salon (id_salon, miasto, kod_pocztowy, adres, telefon, id_kierownika
 	'TAK', '07:30:00', '13:00:00', 'TAK', '09:00:00', '17:00:00', 'NIE', NULL, NULL, 'TAK', '09:00:00', '18:30:00'),
 	(6, 'Dębica', '39-122', 'ul. 23 Lipca', '142349102', 15, 'NIE', 'TAK', '08:30:00', '17:30:00', 'TAK', '12:00:00', '19:00:00',
 	'TAK', '08:00:00', '18:30:00', 'TAK', '07:30:00', '17:45:00', 'TAK', '08:00:00', '09:30:00', 'TAK', '09:00:00', '13:30:00');
-	
 
-drop table if exists salon_samochody cascade;
-CREATE TABLE salon_samochody
+
+drop table if exists samochody cascade;
+CREATE TABLE samochody
 (
-	id_salon numeric(4) REFERENCES salon,
-	id_samochodu numeric(10) REFERENCES samochody,
+	id_samochodu numeric(10) PRIMARY KEY,
+	id_model numeric(4) REFERENCES modele NOT NULL,
+	id_wlasciciel numeric(6) REFERENCES klienci_salonu, 
+	id_wyposazenie numeric(4) REFERENCES wyposazenie,
+	id_salon numeric(4) REFERENCES salon NOT NULL,
+	rok_produkcji numeric(4) NOT NULL,
+	cena numeric(10,2) NOT NULL,
+	nowy char(3) NOT NULL,
+	liczba_miejsc numeric(2),
+	liczba_drzwi numeric(2),
+	id_naped numeric(2) REFERENCES rodzaj_napedu NOT NULL,
+	silnik varchar(20) NOT NULL,
+	przebieg numeric(10),
+	silnik_moc_KM numeric(3),
+	silnik_moc_kW numeric(3),
+	pojemnosc_silnika numeric(4),
+	kolor varchar(20) NOT NULL,
+	skrzynia_biegow varchar(50),
+	spalanie numeric(3,1),
+	bezwypadkowy char(3),
+	predkosc_max numeric(3),
+	liczba_biegow numeric(2),
+	id_typ numeric(2) REFERENCES typ NOT NULL,
+	przyspieszenie numeric(3,1),
 
-	UNIQUE (id_samochodu),
-	PRIMARY KEY (id_samochodu, id_salon)
+	CHECK((nowy='TAK' AND przebieg is null) OR (nowy='NIE' AND przebieg is distinct from NULL)),
+	CHECK(bezwypadkowy='TAK' OR bezwypadkowy='NIE'),
+	CHECK(silnik IN('benzyna','diesel','hybryda','gaz','elektryczny')),
+	CHECK(skrzynia_biegow='automatyczna' OR skrzynia_biegow='manualna' OR skrzynia_biegow='CVT'),
+	CHECK((nowy='TAK' AND id_wlasciciel is NULL AND bezwypadkowy is NULL) OR (nowy='NIE' AND id_wlasciciel is distinct from NULL AND bezwypadkowy is distinct from NULL)),
+	CHECK((silnik_moc_KM is distinct from NULL AND silnik_moc_kW is distinct from NULL AND silnik_moc_kW<silnik_moc_KM) OR (silnik_moc_KM is distinct from NULL OR silnik_moc_kW is distinct from NULL))
 );
+
+insert into samochody (id_model,id_samochodu,cena,nowy,liczba_drzwi,kolor,id_wyposazenie,
+rok_produkcji,liczba_miejsc,id_naped,silnik,spalanie,skrzynia_biegow,liczba_biegow,
+silnik_moc_KM,predkosc_max,id_typ,przyspieszenie) values 
+(1,1,159100,'TAK',5,'niebieski',1,2018,5,2,'benzyna',5.9,'manualna',6,192,225,2,7.7),
+(6,4,543540,'TAK',4,'niebieski',7,2019,4,3,'diesel',6.8,'automatyczna',8,422,285,5,4.5)
+	;
+--bez wyposazenia
+insert into samochody (id_model,id_samochodu,cena,nowy,liczba_drzwi,kolor,
+rok_produkcji,liczba_miejsc,id_naped,silnik,spalanie,skrzynia_biegow,liczba_biegow,
+silnik_moc_KM,predkosc_max,id_typ) values 
+(13,5,59600,'TAK',5,'srebrny',2020,5,2,'diesel',3.5,'manualna',6,90,175,7)
+	;
+--bez liczby biegow
+insert into samochody (id_model,id_samochodu,cena,nowy,liczba_drzwi,kolor,id_wyposazenie,
+rok_produkcji,liczba_miejsc,id_naped,silnik,spalanie,skrzynia_biegow,
+silnik_moc_KM,predkosc_max,id_typ) values 
+(10,2,199000,'TAK',4,'czarny',14,2018,5,3,'hybryda',4.2,'CVT',223,200,3),
+(11,3,291900,'TAK',4,'srebrny',13,2019,5,1,'hybryda',5.9,'CVT',345,250,3)
+	;
+
+--KM i kw (wyzej tylko KM)
+insert into samochody (id_model,id_samochodu,cena,nowy,liczba_drzwi,kolor,id_wyposazenie,
+rok_produkcji,liczba_miejsc,id_naped,silnik,spalanie,silnik_moc_kW,
+silnik_moc_KM,predkosc_max,id_typ,przyspieszenie) values 
+(14,6,159000,'TAK',4,'niebieski',14,2020,4,3,'elektryczny',0,125,170,150,6,7.3),
+(15,7,617136,'TAK',4,'bialy',8,2020,4,1,'elektryczny',0,460,625,260,3,3.2)
+	;
+
+--id_wlasciciel to poprzedni wlasciciel ktory sprzedal samochod salonowi
+
+
+
 
 
 
