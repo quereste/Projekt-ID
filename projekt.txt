@@ -280,20 +280,6 @@ CREATE TABLE zarzad(
 	telefon varchar (25) NOT NULL
 );
 
-drop table if exists klienci_salonu cascade;
-CREATE TABLE klienci_salonu
-(
-	id_klienta numeric(6) PRIMARY KEY,
-	imie varchar(20),
-	nazwisko varchar(30),
-	nazwa varchar(100),
-	telefon varchar(25),
-	email varchar(50),
-
-	CHECK (telefon IS NOT NULL OR email IS NOT NULL),
-	CHECK((imie IS NOT NULL AND nazwisko IS NOT NULL) OR nazwa IS NOT NULL)
-);
-
 drop table if exists salon cascade;
 CREATE TABLE salon
 (
@@ -361,6 +347,34 @@ insert into salon (id_salon, miasto, kod_pocztowy, adres, telefon, id_kierownika
 	(6, 'Dębica', '39-122', 'ul. 23 Lipca', '142349102', 15, 'NIE', 'TAK', '08:30:00', '17:30:00', 'TAK', '12:00:00', '19:00:00',
 	'TAK', '08:00:00', '18:30:00', 'TAK', '07:30:00', '17:45:00', 'TAK', '08:00:00', '09:30:00', 'TAK', '09:00:00', '13:30:00');
 
+drop table if exists doradcy cascade;
+CREATE TABLE doradcy
+(
+	id_doradcy numeric(4) PRIMARY KEY,
+	id_salon numeric(4) REFERENCES salon NOT NULL,
+	imie varchar(20) NOT NULL,
+	nazwisko varchar(30) NOT NULL,
+	telefon varchar(25) NOT NULL,
+	email varchar(50) NOT NULL
+);
+
+
+drop table if exists klienci_salonu cascade;
+CREATE TABLE klienci_salonu
+(
+	id_klienta numeric(6) PRIMARY KEY,
+	id_doradcy numeric(4) REFERENCES doradcy,
+	imie varchar(20),
+	nazwisko varchar(30),
+	nazwa varchar(100),
+	telefon varchar(25),
+	email varchar(50),
+
+	CHECK (telefon IS NOT NULL OR email IS NOT NULL),
+	CHECK((imie IS NOT NULL AND nazwisko IS NOT NULL) OR nazwa IS NOT NULL)
+);
+
+
 
 drop table if exists samochody cascade;
 CREATE TABLE samochody
@@ -427,8 +441,6 @@ silnik_moc_KM,predkosc_max,id_typ,przyspieszenie) values
 	;
 
 --id_wlasciciel to poprzedni wlasciciel ktory sprzedal samochod salonowi
-
-
 
 
 
