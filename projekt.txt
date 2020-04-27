@@ -426,6 +426,34 @@ insert into klienci_salonu(id_klienta, id_doradcy, imie, nazwisko, telefon, emai
 (30, 6, 'Justyna', 'Larssen', '291273819', 'justi_lar_291@domena.com')
 	;
 
+insert into klienci_salonu(id_klienta, id_doradcy, nazwa, telefon, email) values
+
+(31, 2, 'Zarząd Zieleni Miejskiej Niepołomice sp. z o.o', '124938372', 'niepolomice.zielen@domena.com'),
+(32, 3, 'Anielski Orszak - Zakład Usług Pogrzebowo - Grabarskich Lipinki', 'lipinki.anielskiorszak@kl.lk'),
+(33, 1, 'Okamgnienie - Pożyczki', '123459382', 'okamgnienie@mi.pl'),
+(34, 1, 'Hubert Stolarz - Remonty', '472819283', 'hstolarz@remont.pl'),
+(35, 3, 'Gorlice i Okolice - Wycieczki w plenerze', '739304938', 'poznajgorlice@domena.com'),
+(36, 5, 'Rusałka - kajaki, łódki - wypożyczalnia', '749382019', 'rusalka@kajak.com'),
+(37, 6, 'Językowy Poznań - Szkoła Języków Obcych', '728392817', 'pjezyki@sjo.com'),
+(38, 5, 'Wędliny Zbójnik', '372829382', 'zbojnikwedliny@domena.com'),
+(39, 6, 'Marcel Mich - Kursy Pszczelarskie', '728293019', pszczelarz.kobylnica@lk.lk'),
+(40, 6, 'NordicWalking nad Prosną', '283928382', 'prosna.wycieczki@domena.com'),
+(41, 4, 'Drzwi i Okna Poznań - Winogrady', '738298371', 'winogrady.firma@domena.com'),
+(42, 8, 'Mokotów - Przeprowadzka dla Ciebie' , '746294029', 'moko_przepro@domena.com'),
+(43, 8, 'Piekarnia WP - Wypieki Pawła', '758392823', 'wppiekarnia@domena.com'),
+(44, 9, 'O Polu i Dworze - Wycieczki w Przeszłość', '485938493', 'opole.historia@mi.pl'),
+(45, 9, 'UKS Opolanka Opole', '849302938', 'opolankaopole.pilka@gh.com'),
+(46, 11, 'Parafia Opole', '389230299', 'parafia_opole@domena.com'),
+(47, 10, 'Wojciech Mirko - Zdun', '189930298', 'zdun.opole@lk.kl'),
+(48, 12, 'Elektryka dla Bzika - Koło Młodych Fizyków', '849283928', 'kmf.edb@mi.pl'),
+(49, 12, 'Miłosz Mila - Fotografia', '827391029', 'mmfoto@kielce.pl'),
+(50, 12, 'Tanie Kieleckie Taksówki', '382910392', 'tkt@domena.com'),
+(51, 12, 'Robert - Przewóz Osób', '829102938', 'rpo@lk.kl'),
+(52, 12, 'Szyk i Styl - Fryzjer Kielce', '829019283', 'sisfk@mi.pl'),
+(53, 14, 'Korepetycje - Dębica', '823749039', 'debica.korepetycje.pl'),
+(54, 14, 'Szewc Dratewka', '798345789', 'dratwa.szewc12@domena.com'),
+(55, 15, 'Ludwisarz - Szybko, Tanio, z Humorem', NULL, 'ludwisarz.debica@domena.com')
+	;
 
 drop table if exists samochody cascade;
 CREATE TABLE samochody
