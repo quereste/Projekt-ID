@@ -358,6 +358,24 @@ CREATE TABLE doradcy
 	email varchar(50) NOT NULL
 );
 
+insert into doradcy(id_doradcy, id_salon, imie, nazwisko, telefon, email) values
+
+(1, 1, 'Michał', 'Radowicz', '815921910', 'rad_dla_porad@salon.com'),
+(2, 1, 'Wojciech', 'Praskiniuk', '603495392', 'wpraskiniuk_salon@salon.com'),
+(3, 1, 'Elżbieta', 'Łorzycz', '507891345', 'elorzycz@salon.com'),
+(4, 2, 'Piotr', 'Las', '473920100', 'laspiotrr@salon.com'),
+(5, 2, 'Andrzej', 'Narlik', '603019029', 'anarlik@salon.com'),
+(6, 2, 'Rafał', 'Plotek', null, 'rplotek@salon.com'),
+(7, 3, 'Aleksandra' 'Willinowicz', '540291029', 'a.willinowicz@salon.com'),
+(8, 3, 'Karolina', 'Steczko', '755039291', 'karsteczko@salon.com'),
+(9, 4, 'Urszula', 'Kaj', NULL, 'ukaj@salon.com'),
+(10, 4, 'Hanna', 'Lubecka', '503920192', 'hanna.lubecka@salon.com'),
+(11, 4, 'Władysław', 'Nikiliszyn', '740392810', 'wniki@salon.com'),
+(12, 5, 'Paweł', 'Obrotny', '649201928', 'pawel.obrotny@salon.com'),
+(13, 6, 'Pola', 'Wurcel', '682920192', NULL),
+(14, 6, 'Konstanty', 'Brodziszewski', '739201928', 'kbrodziszewski@salon.com'),
+(15, 6, 'Mikołaj', 'Zasiecki', NULL, 'mzasiek@salon.com')
+	;
 
 drop table if exists klienci_salonu cascade;
 CREATE TABLE klienci_salonu
@@ -373,7 +391,6 @@ CREATE TABLE klienci_salonu
 	CHECK (telefon IS NOT NULL OR email IS NOT NULL),
 	CHECK((imie IS NOT NULL AND nazwisko IS NOT NULL) OR nazwa IS NOT NULL)
 );
-
 
 
 drop table if exists samochody cascade;
