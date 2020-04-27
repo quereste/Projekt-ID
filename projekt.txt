@@ -392,6 +392,40 @@ CREATE TABLE klienci_salonu
 	CHECK((imie IS NOT NULL AND nazwisko IS NOT NULL) OR nazwa IS NOT NULL)
 );
 
+insert into klienci_salonu(id_klienta, id_doradcy, imie, nazwisko, telefon, email) values
+	
+(1, 3, 'Marek', 'Wozidło', '859382712', NULL),
+(2, 8, 'Patryk', 'Tretz', '543291823', 'trectryk@domena.com'),
+(3, 11, 'Paulina', 'Zdrojna', '928172947', 'paula_z_d@qi.pl'),
+(4, 15, 'Leon', 'Borsuk', '127482712', NULL),
+(5, 7, 'Piotr', 'Bucki', '281928172', 'pb_ucki@tk.pl'),
+(6, 10, 'Kamila', 'Niedrzecka', '129482019', 'kama_nieka@wi.com'),
+(7, 2, 'Ludomir', 'Kostrzynko', '274719287', 'lokostrzynko@qw.un'),
+(8, 5, 'Andrzej', 'Durkiewicz', NULL, 'adurkiewicz@domena.com'),
+(9, 11, 'Adrianna', 'Arkiuk', '291823812', 'aakk_191@mi.pl'),
+(10, 4, 'Walerian', 'Koska', '291029381', 'wkos_ka@domena.com'),
+(11, 6, 'Porfiry', 'Genecki', '492810391', 'pgeneta@domena.com'),
+(12, 8, 'Alojzy', 'Mostrzycki', '291820192', 'a.mostrzycki@lk.kl'),
+(13, 9, 'Konstantyn', 'Afinicz', '928102938', NULL),
+(14, 1, 'Lidia', 'Andrzejewna', NULL, 'landrzejewna@domena.com'),
+(15, 13, 'Filip', 'Steff', NULL, 'fsteff@dk.kl'),
+(16, 4, 'Kamil', 'Drzazga', NULL, kdrzazga@domena.com'),
+(17, 3, 'Witold', 'Urbanowicz', '281928172', 'fi_mail_3@mi.pl'),
+(18, 9, 'Artur', 'Mic', '128374382', 'amicki@domena.com'),
+(19, 10, 'Nikodem', 'Potocki', '827102918', 'nipotocki@lk.kl'),
+(20, 2, 'Maria', 'Olisz', '283918291', 'marysolisz@domena.com'),
+(21, 7, 'Eleonora', 'Wirzko', '827102812', 'e.wirzko@domena.com'),
+(22, 13, 'Lech', 'Strumień', '283918203', 'tr.dk_291@lwi.com'),
+(23, 8, 'Nadia', 'Kuśnierz', '748293812', 'nkusnierz1906@mi.com'),
+(24, 5, 'Paweł', 'Zadrzek', '1283729382', 'pzadrzek@domena.com'),
+(25, 1, 'Magdalena', 'Nikołajewna', '563829172', 'mniki_kk@lk.kl'),
+(26, 7, 'Euzebiusz', 'Nil', '827203918', 'enilck_23@domena.com'),
+(27, 4, 'Małgorzata', 'Koszmir', '921092919', 'mkoszmir@domena.com'),
+(28, 9, 'Kacper', 'Wójcik', '473928372', 'bacper_w@mi.pl'),
+(29, 12, 'Bogusław', 'Iwanowski', '729382102', 'mkibogus@mi.pl'),
+(30, 6, 'Justyna', 'Larssen', '291273819', 'justi_lar_291@domena.com')
+	;
+
 
 drop table if exists samochody cascade;
 CREATE TABLE samochody
