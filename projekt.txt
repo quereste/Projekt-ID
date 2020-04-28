@@ -402,7 +402,6 @@ CREATE TABLE klienci_salonu
 );
 
 insert into klienci_salonu(id_klienta, id_doradcy, imie, nazwisko, telefon, email) values
-	
 (1, 3, 'Marek', 'Wozidło', '859382712', NULL),
 (2, 8, 'Patryk', 'Tretz', '543291823', 'trectryk@domena.com'),
 (3, 11, 'Paulina', 'Zdrojna', '928172947', 'paula_z_d@qi.pl'),
