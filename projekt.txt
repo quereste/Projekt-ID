@@ -1,4 +1,4 @@
-﻿drop table if exists marki cascade;
+drop table if exists marki cascade;
 CREATE TABLE marki 
 (
 	id_marka numeric(3) PRIMARY KEY,
@@ -272,13 +272,22 @@ insert into modele_kraje(id_model,id_kraju) values
 (15,2)
 	;
 
-drop table if exists zarzad cascade;
-CREATE TABLE zarzad(
+drop table if exists kierownicy cascade;
+CREATE TABLE kierownicy(
 	id_kierownika numeric(2) PRIMARY KEY,
 	imie varchar (20) NOT NULL,
 	nazwisko varchar (30) NOT NULL,
 	telefon varchar (25) NOT NULL
 );
+
+insert into kierownicy(id_kierownika, imie, nazwisko, telefon) values
+	(10, 'Marcel', 'Buda', '293819292'),
+	(11, 'Mira', 'Len', '218398293'),
+	(14, 'Janina', 'Krucień', '129389382'),
+	(23, 'Leon', 'Modrzejski', '943939203'),
+	(25, 'Nikodem', 'Pyksa', '723939029'),
+	(15, 'Kamil', 'Berko', '839290291')
+		;
 
 drop table if exists salon cascade;
 CREATE TABLE salon
@@ -288,7 +297,7 @@ CREATE TABLE salon
 	kod_pocztowy char(6),
 	adres varchar(50),
 	telefon varchar(25),
-	id_kierownika numeric(2) REFERENCES zarzad NOT NULL,
+	id_kierownika numeric(2) REFERENCES kierownicy NOT NULL,
 	tylko_nowe char(3), 
 	otwarte_pon char(3),
 	otwarcie_pon time,
@@ -340,7 +349,7 @@ insert into salon (id_salon, miasto, kod_pocztowy, adres, telefon, id_kierownika
 	'TAK', '09:00:00', '19:00:00', 'TAK', '08:30:00', '17:30:00', 'NIE', NULL, NULL, 'NIE', NULL, NULL),
 	(3,'Warszawa', '00-008', 'ul. Krasna 124', '220192031', 14, 'TAK', 'TAK', '12:00:00', '18:00:00',
 	'TAK', '09:00:00', '16:00:00', 'TAK', '09:00:00', '19:00:00', 'TAK', '13:00:00', '19:30:00', 'NIE',NULL,NULL, 'NIE', NULL,NULL),
-	(4,'Opole', '45-001', 'ul. Zarzecze 9', '771231231', 23, 'NIE', 'NIE', NULL, NULL, 'NIE', NULL, NULL, 'TAK'
+	(4,'Opole', '45-001', 'ul. Zarzecze 9', '771231231', 23, 'NIE', 'NIE', NULL, NULL, 'NIE', NULL, NULL, 'TAK',
 	'08:00:00', '16:30:00', 'TAK', '10:00:00', '19:00:00', 'TAK', '11:00:00', '19:00:00', 'NIE', NULL, NULL),
 	(5,'Kielce', '25-241', 'ul. Rzemieślnicza 191', '419210291', 25, 'NIE', 'TAK', '09:00:00', '17:00:00',  'NIE', NULL, NULL,
 	'TAK', '07:30:00', '13:00:00', 'TAK', '09:00:00', '17:00:00', 'NIE', NULL, NULL, 'TAK', '09:00:00', '18:30:00'),
@@ -365,16 +374,16 @@ insert into doradcy(id_doradcy, id_salon, imie, nazwisko, telefon, email) values
 (3, 1, 'Elżbieta', 'Łorzycz', '507891345', 'elorzycz@salon.com'),
 (4, 2, 'Piotr', 'Las', '473920100', 'laspiotrr@salon.com'),
 (5, 2, 'Andrzej', 'Narlik', '603019029', 'anarlik@salon.com'),
-(6, 2, 'Rafał', 'Plotek', null, 'rplotek@salon.com'),
-(7, 3, 'Aleksandra' 'Willinowicz', '540291029', 'a.willinowicz@salon.com'),
+(6, 2, 'Rafał', 'Plotek', '920929182', 'rplotek@salon.com'),
+(7, 3, 'Aleksandra', 'Willinowicz', '540291029', 'a.willinowicz@salon.com'),
 (8, 3, 'Karolina', 'Steczko', '755039291', 'karsteczko@salon.com'),
-(9, 4, 'Urszula', 'Kaj', NULL, 'ukaj@salon.com'),
+(9, 4, 'Urszula', 'Kaj', '382918283', 'ukaj@salon.com'),
 (10, 4, 'Hanna', 'Lubecka', '503920192', 'hanna.lubecka@salon.com'),
 (11, 4, 'Władysław', 'Nikiliszyn', '740392810', 'wniki@salon.com'),
 (12, 5, 'Paweł', 'Obrotny', '649201928', 'pawel.obrotny@salon.com'),
-(13, 6, 'Pola', 'Wurcel', '682920192', NULL),
+(13, 6, 'Pola', 'Wurcel', '682920192', 'powur@mi.pl'),
 (14, 6, 'Konstanty', 'Brodziszewski', '739201928', 'kbrodziszewski@salon.com'),
-(15, 6, 'Mikołaj', 'Zasiecki', NULL, 'mzasiek@salon.com')
+(15, 6, 'Mikołaj', 'Zasiecki', '273817388', 'mzasiek@salon.com')
 	;
 
 drop table if exists klienci_salonu cascade;
@@ -409,7 +418,7 @@ insert into klienci_salonu(id_klienta, id_doradcy, imie, nazwisko, telefon, emai
 (13, 9, 'Konstantyn', 'Afinicz', '928102938', NULL),
 (14, 1, 'Lidia', 'Andrzejewna', NULL, 'landrzejewna@domena.com'),
 (15, 13, 'Filip', 'Steff', NULL, 'fsteff@dk.kl'),
-(16, 4, 'Kamil', 'Drzazga', NULL, kdrzazga@domena.com'),
+(16, 4, 'Kamil', 'Drzazga', NULL, 'kdrzazga@domena.com'),
 (17, 3, 'Witold', 'Urbanowicz', '281928172', 'fi_mail_3@mi.pl'),
 (18, 9, 'Artur', 'Mic', '128374382', 'amicki@domena.com'),
 (19, 10, 'Nikodem', 'Potocki', '827102918', 'nipotocki@lk.kl'),
@@ -429,14 +438,14 @@ insert into klienci_salonu(id_klienta, id_doradcy, imie, nazwisko, telefon, emai
 insert into klienci_salonu(id_klienta, id_doradcy, nazwa, telefon, email) values
 
 (31, 2, 'Zarząd Zieleni Miejskiej Niepołomice sp. z o.o', '124938372', 'niepolomice.zielen@domena.com'),
-(32, 3, 'Anielski Orszak - Zakład Usług Pogrzebowo - Grabarskich Lipinki', 'lipinki.anielskiorszak@kl.lk'),
+(32, 3, 'Anielski Orszak - Zakład Usług Pogrzebowo - Grabarskich Lipinki', '129392929', 'lipinki.anielskiorszak@kl.lk'),
 (33, 1, 'Okamgnienie - Pożyczki', '123459382', 'okamgnienie@mi.pl'),
 (34, 1, 'Hubert Stolarz - Remonty', '472819283', 'hstolarz@remont.pl'),
 (35, 3, 'Gorlice i Okolice - Wycieczki w plenerze', '739304938', 'poznajgorlice@domena.com'),
 (36, 5, 'Rusałka - kajaki, łódki - wypożyczalnia', '749382019', 'rusalka@kajak.com'),
 (37, 6, 'Językowy Poznań - Szkoła Języków Obcych', '728392817', 'pjezyki@sjo.com'),
 (38, 5, 'Wędliny Zbójnik', '372829382', 'zbojnikwedliny@domena.com'),
-(39, 6, 'Marcel Mich - Kursy Pszczelarskie', '728293019', pszczelarz.kobylnica@lk.lk'),
+(39, 6, 'Marcel Mich - Kursy Pszczelarskie', '728293019', 'pszczelarz.kobylnica@lk.lk'),
 (40, 6, 'NordicWalking nad Prosną', '283928382', 'prosna.wycieczki@domena.com'),
 (41, 4, 'Drzwi i Okna Poznań - Winogrady', '738298371', 'winogrady.firma@domena.com'),
 (42, 8, 'Mokotów - Przeprowadzka dla Ciebie' , '746294029', 'moko_przepro@domena.com'),
@@ -512,13 +521,13 @@ silnik_moc_KM,predkosc_max,id_typ,przyspieszenie, id_wlasciciel, przebieg, bezwy
 (1, 7, 24, 3900, 'NIE', 5, 'karmazynowy', NULL, 1997, 5, 2, 'benzyna', 8.1, 'manualna', 5, 71, 170, 4, 13.3, 28, 162000, 'TAK'),
 (2, 7, 25, 2300, 'NIE', 5, 'czarny', NULL, 1996, 5, 2, 'diesel', 5.4, 'automatyczna', 4,  68, 165, 4, 16.5, 7, 173000, 'NIE')
 	;
-insert into samochody(id_model,id_samochodu,cena,nowy,liczba_drzwi,kolor,id_wyposazenie,
+insert into samochody(id_salon, id_model,id_samochodu,cena,nowy,liczba_drzwi,kolor,id_wyposazenie,
 rok_produkcji,liczba_miejsc,id_naped,silnik,spalanie,skrzynia_biegow,liczba_biegow,
 silnik_moc_KM,predkosc_max,id_typ,przyspieszenie) values 
 (1,1,1,159100,'TAK',5,'niebieski',1,2018,5,2,'benzyna',5.9,'manualna',6,192,225,2,7.7),
-(1, 1, 8, 143900, 'TAK', 5, 'srebrny', 2, 2012, 5, 1, 'benzyna', 7.2, 'automatyczna', 8, 245, 2, 6.4),
-(1, 1, 9, 162100, 'TAK', 5, 'czarny', 5, 2016, 5, 3, 'diesel'. 5.2, 'automatyczna', 8, 189, 2, 11.3),
-(1, 6,4,543540,'TAK',5,'niebieski',7,2019,4,3,'diesel',6.8,'automatyczna',8,422,285,5,4.5),
+(1, 1, 8, 143900, 'TAK', 5, 'srebrny', 2, 2012, 5, 1, 'benzyna', 7.2, 'automatyczna', 8, 245,240, 2, 6.4),
+(1, 1, 9, 162100, 'TAK', 5, 'czarny', 5, 2016, 5, 3, 'diesel', 5.2, 'automatyczna', 8, 116, 189, 2, 11.3),
+(1, 6,4,543540,'TAK',5,'niebieski',7,2019,4,3,'diesel',6.8,'automatyczna',8,422,285,5,4.5)
 	;
 --bez wyposazenia
 insert into samochody (id_salon, id_model,id_samochodu,cena,nowy,liczba_drzwi,kolor,
@@ -535,7 +544,7 @@ silnik_moc_KM,predkosc_max,id_typ) values
 	;
 
 --KM i kw (wyzej tylko KM)
-insert into samochody (id_salon id_model,id_samochodu,cena,nowy,liczba_drzwi,kolor,id_wyposazenie,
+insert into samochody (id_salon, id_model,id_samochodu,cena,nowy,liczba_drzwi,kolor,id_wyposazenie,
 rok_produkcji,liczba_miejsc,id_naped,silnik,spalanie,silnik_moc_kW,
 silnik_moc_KM,predkosc_max,id_typ,przyspieszenie) values 
 (1, 14,6,159000,'TAK',4,'niebieski',14,2020,4,3,'elektryczny',0,125,170,150,6,7.3),
@@ -547,7 +556,7 @@ silnik_moc_KM,predkosc_max,id_typ,przyspieszenie) values
 
 
 
---zarz¹d na razie tworz¹ ka¿dorazowi kierownicy salonów 
 --salon_samochody pamiêta informacje o tym w którym salonie jest który samochód
 --samochód to jakiœ konkretny pojazd, ka¿dy jest unikalnym obiektem
 --modele to ogólna kategoria, ró¿ni siê od tabeli samochod tym ¿e mo¿e byæ wiele samochodów o tym samym id_modelu, ale ka¿dy jest ró¿ny (np. cena)
+
