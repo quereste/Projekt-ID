@@ -1,4 +1,4 @@
-drop table if exists marki cascade;
+﻿drop table if exists marki cascade;
 CREATE TABLE marki 
 (
 	id_marka numeric(3) PRIMARY KEY,
@@ -281,7 +281,7 @@ CREATE TABLE kierownicy(
 );
 
 insert into kierownicy(id_kierownika, imie, nazwisko, telefon) values
-	(10, 'Marcel', 'Buda', '293819292'),
+(10, 'Marcel', 'Buda', '293819292'),
 	(11, 'Mira', 'Len', '218398293'),
 	(14, 'Janina', 'Krucień', '129389382'),
 	(23, 'Leon', 'Modrzejski', '943939203'),
