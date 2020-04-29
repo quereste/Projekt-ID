@@ -549,7 +549,17 @@ silnik_moc_KM,predkosc_max,id_typ,przyspieszenie) values
 (1, 14,6,159000,'TAK',4,'niebieski',14,2020,4,3,'elektryczny',0,125,170,150,6,7.3),
 (1, 15,7,617136,'TAK',4,'bialy',8,2020,4,1,'elektryczny',0,460,625,260,3,3.2)
 	;
+CREATE TABLE transakcje(
+        id_transakcji numeric(10) PRIMARY KEY,
+        id_modelu numeric(4) REFERENCES modele,
+        data_transakcji date NOT NULL,
+        wartosc_transakcji numeric (10) NOT NULL,
+        sprzedaz char(3) NOT NULL,
+        id_wlasciciel numeric(6) REFERENCES klienci_salonu,
+        komentarz varchar (1000),
 
+        CHECK (sprzedaz='TAK' OR (sprzedaz='NIE' AND id_wlasciciel IS NOT NULL))
+);
 --id_wlasciciel to poprzedni wlasciciel ktory sprzedal samochod salonowi
 
 
