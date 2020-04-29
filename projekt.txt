@@ -396,13 +396,14 @@ CREATE TABLE klienci_salonu
 	nazwa varchar(100),
 	telefon varchar(25),
 	email varchar(50),
-	newsletter char(3),
+	newsletter char(3) NOT NULL,
 	CHECK (telefon IS NOT NULL OR email IS NOT NULL),
-	CHECK((imie IS NOT NULL AND nazwisko IS NOT NULL) OR nazwa IS NOT NULL)
+	CHECK((imie IS NOT NULL AND nazwisko IS NOT NULL) OR nazwa IS NOT NULL),
+	CHECK((newsletter='TAK' AND email IS NOT NULL) OR newsletter='NIE')
 );
 
 insert into klienci_salonu(id_klienta, id_doradcy, imie, nazwisko, telefon, email, newsletter) values
-(1, 3, 'Marek', 'Wozidło', '859382712', NULL, 'TAK'),
+(1, 3, 'Marek', 'Wozidło', '859382712', NULL, 'NIE'),
 (2, 8, 'Patryk', 'Tretz', '543291823', 'trectryk@domena.com', 'TAK'),
 (3, 11, 'Paulina', 'Zdrojna', '928172947', 'paula_z_d@qi.pl', 'TAK'),
 (4, 15, 'Leon', 'Borsuk', '127482712', NULL, 'NIE'),
@@ -551,6 +552,7 @@ drop table if exists historia_transakcji cascade;
 CREATE TABLE historia_transakcji
 (
         id_transakcji numeric(10) PRIMARY KEY,
+	id_salon numeric(4) REFERENCES salon,
         id_modelu numeric(4) REFERENCES modele,
         data_transakcji date NOT NULL,
         wartosc_transakcji numeric(10) NOT NULL,
@@ -561,3 +563,5 @@ CREATE TABLE historia_transakcji
 	CHECK(id_klienta IS NOT NULL),
         CHECK(sprzedaz='TAK' OR sprzedaz='NIE')
 );
+insert into historia_transakcji(id_transakcji, id_salon, id_modelu, data_transakcji, wartosc_transakcji, sprzedaz, id_klienta, komentarz) values
+(1, 1, 1, '2019-05-31', '34000', 'TAK', 1, 'pierwsza sprzedaz');
