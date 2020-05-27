@@ -283,7 +283,7 @@ CREATE TABLE kierownicy(
 insert into kierownicy(id_kierownika, imie, nazwisko, telefon) values
 (10, 'Marcel', 'Buda', '293819292'),
 (11, 'Mira', 'Len', '218398293'),
-(14, 'Janina', 'Krucień', '129389382'),
+(14, 'Janina', 'Krucien', '129389382'),
 (23, 'Leon', 'Modrzejski', '943939203'),
 (25, 'Nikodem', 'Pyksa', '723939029'),
 (15, 'Kamil', 'Berko', '839290291')
@@ -351,9 +351,9 @@ insert into salon (id_salon, miasto, kod_pocztowy, adres, telefon, id_kierownika
 	'TAK', '09:00:00', '16:00:00', 'TAK', '09:00:00', '19:00:00', 'TAK', '13:00:00', '19:30:00', 'NIE',NULL,NULL, 'NIE', NULL,NULL),
 (4,'Opole', '45-001', 'ul. Zarzecze 9', '771231231', 23, 'NIE', 'NIE', NULL, NULL, 'NIE', NULL, NULL, 'TAK',
 	'08:00:00', '16:30:00', 'TAK', '10:00:00', '19:00:00', 'TAK', '11:00:00', '19:00:00', 'NIE', NULL, NULL),
-(5,'Kielce', '25-241', 'ul. Rzemieślnicza 191', '419210291', 25, 'NIE', 'TAK', '09:00:00', '17:00:00',  'NIE', NULL, NULL,
+(5,'Kielce', '25-241', 'ul. Rzemieslnicza 191', '419210291', 25, 'NIE', 'TAK', '09:00:00', '17:00:00',  'NIE', NULL, NULL,
 	'TAK', '07:30:00', '13:00:00', 'TAK', '09:00:00', '17:00:00', 'NIE', NULL, NULL, 'TAK', '09:00:00', '18:30:00'),
-(6, 'Dębica', '39-122', 'ul. 23 Lipca', '142349102', 15, 'NIE', 'TAK', '08:30:00', '17:30:00', 'TAK', '12:00:00', '19:00:00',
+(6, 'Debica', '39-122', 'ul. 23 Lipca', '142349102', 15, 'NIE', 'TAK', '08:30:00', '17:30:00', 'TAK', '12:00:00', '19:00:00',
 	'TAK', '08:00:00', '18:30:00', 'TAK', '07:30:00', '17:45:00', 'TAK', '08:00:00', '09:30:00', 'TAK', '09:00:00', '13:30:00')
 ;
 
@@ -369,21 +369,21 @@ CREATE TABLE doradcy
 );
 
 insert into doradcy(id_doradcy, id_salon, imie, nazwisko, telefon, email) values
-(1, 1, 'Michał', 'Radowicz', '815921910', 'rad_dla_porad@salon.com'),
+(1, 1, 'Michal', 'Radowicz', '815921910', 'rad_dla_porad@salon.com'),
 (2, 1, 'Wojciech', 'Praskiniuk', '603495392', 'wpraskiniuk_salon@salon.com'),
-(3, 1, 'Elżbieta', 'Łorzycz', '507891345', 'elorzycz@salon.com'),
+(3, 1, 'Elzbieta', 'lorzycz', '507891345', 'elorzycz@salon.com'),
 (4, 2, 'Piotr', 'Las', '473920100', 'laspiotrr@salon.com'),
 (5, 2, 'Andrzej', 'Narlik', '603019029', 'anarlik@salon.com'),
-(6, 2, 'Rafał', 'Plotek', '920929182', 'rplotek@salon.com'),
+(6, 2, 'Rafal', 'Plotek', '920929182', 'rplotek@salon.com'),
 (7, 3, 'Aleksandra', 'Willinowicz', '540291029', 'a.willinowicz@salon.com'),
 (8, 3, 'Karolina', 'Steczko', '755039291', 'karsteczko@salon.com'),
 (9, 4, 'Urszula', 'Kaj', '382918283', 'ukaj@salon.com'),
 (10, 4, 'Hanna', 'Lubecka', '503920192', 'hanna.lubecka@salon.com'),
-(11, 4, 'Władysław', 'Nikiliszyn', '740392810', 'wniki@salon.com'),
-(12, 5, 'Paweł', 'Obrotny', '649201928', 'pawel.obrotny@salon.com'),
+(11, 4, 'Wladyslaw', 'Nikiliszyn', '740392810', 'wniki@salon.com'),
+(12, 5, 'Pawel', 'Obrotny', '649201928', 'pawel.obrotny@salon.com'),
 (13, 6, 'Pola', 'Wurcel', '682920192', 'powur@mi.pl'),
 (14, 6, 'Konstanty', 'Brodziszewski', '739201928', 'kbrodziszewski@salon.com'),
-(15, 6, 'Mikołaj', 'Zasiecki', '273817388', 'mzasiek@salon.com')
+(15, 6, 'Mikolaj', 'Zasiecki', '273817388', 'mzasiek@salon.com')
 ;
 
 drop table if exists klienci_salonu cascade;
@@ -402,7 +402,7 @@ CREATE TABLE klienci_salonu
 );
 
 insert into klienci_salonu(id_klienta, id_doradcy, imie, nazwisko, telefon, email) values
-(1, 3, 'Marek', 'Wozidło', '859382712', NULL),
+(1, 3, 'Marek', 'Wozidlo', '859382712', NULL),
 (2, 8, 'Patryk', 'Tretz', '543291823', 'trectryk@domena.com'),
 (3, 11, 'Paulina', 'Zdrojna', '928172947', 'paula_z_d@qi.pl'),
 (4, 15, 'Leon', 'Borsuk', '127482712', NULL),
@@ -423,41 +423,41 @@ insert into klienci_salonu(id_klienta, id_doradcy, imie, nazwisko, telefon, emai
 (19, 10, 'Nikodem', 'Potocki', '827102918', 'nipotocki@lk.kl'),
 (20, 2, 'Maria', 'Olisz', '283918291', 'marysolisz@domena.com'),
 (21, 7, 'Eleonora', 'Wirzko', '827102812', 'e.wirzko@domena.com'),
-(22, 13, 'Lech', 'Strumień', '283918203', 'tr.dk_291@lwi.com'),
-(23, 8, 'Nadia', 'Kuśnierz', '748293812', 'nkusnierz1906@mi.com'),
-(24, 5, 'Paweł', 'Zadrzek', '1283729382', 'pzadrzek@domena.com'),
-(25, 1, 'Magdalena', 'Nikołajewna', '563829172', 'mniki_kk@lk.kl'),
+(22, 13, 'Lech', 'Strumien', '283918203', 'tr.dk_291@lwi.com'),
+(23, 8, 'Nadia', 'Kusnierz', '748293812', 'nkusnierz1906@mi.com'),
+(24, 5, 'Pawel', 'Zadrzek', '1283729382', 'pzadrzek@domena.com'),
+(25, 1, 'Magdalena', 'Nikolajewna', '563829172', 'mniki_kk@lk.kl'),
 (26, 7, 'Euzebiusz', 'Nil', '827203918', 'enilck_23@domena.com'),
-(27, 4, 'Małgorzata', 'Koszmir', '921092919', 'mkoszmir@domena.com'),
-(28, 9, 'Kacper', 'Wójcik', '473928372', 'bacper_w@mi.pl'),
-(29, 12, 'Bogusław', 'Iwanowski', '729382102', 'mkibogus@mi.pl'),
+(27, 4, 'Malgorzata', 'Koszmir', '921092919', 'mkoszmir@domena.com'),
+(28, 9, 'Kacper', 'Wojcik', '473928372', 'bacper_w@mi.pl'),
+(29, 12, 'Boguslaw', 'Iwanowski', '729382102', 'mkibogus@mi.pl'),
 (30, 6, 'Justyna', 'Larssen', '291273819', 'justi_lar_291@domena.com')
 ;
 
 insert into klienci_salonu(id_klienta, id_doradcy, nazwa, telefon, email) values
-(31, 2, 'Zarząd Zieleni Miejskiej Niepołomice sp. z o.o', '124938372', 'niepolomice.zielen@domena.com'),
-(32, 3, 'Anielski Orszak - Zakład Usług Pogrzebowo - Grabarskich Lipinki', '129392929', 'lipinki.anielskiorszak@kl.lk'),
-(33, 1, 'Okamgnienie - Pożyczki', '123459382', 'okamgnienie@mi.pl'),
+(31, 2, 'Zarzad Zieleni Miejskiej Niepolomice sp. z o.o', '124938372', 'niepolomice.zielen@domena.com'),
+(32, 3, 'Anielski Orszak - Zaklad Uslug Pogrzebowo - Grabarskich Lipinki', '129392929', 'lipinki.anielskiorszak@kl.lk'),
+(33, 1, 'Okamgnienie - Pozyczki', '123459382', 'okamgnienie@mi.pl'),
 (34, 1, 'Hubert Stolarz - Remonty', '472819283', 'hstolarz@remont.pl'),
 (35, 3, 'Gorlice i Okolice - Wycieczki w plenerze', '739304938', 'poznajgorlice@domena.com'),
-(36, 5, 'Rusałka - kajaki, łódki - wypożyczalnia', '749382019', 'rusalka@kajak.com'),
-(37, 6, 'Językowy Poznań - Szkoła Języków Obcych', '728392817', 'pjezyki@sjo.com'),
-(38, 5, 'Wędliny Zbójnik', '372829382', 'zbojnikwedliny@domena.com'),
+(36, 5, 'Rusalka - kajaki, lodzie - wypozyczalnia', '749382019', 'rusalka@kajak.com'),
+(37, 6, 'Jezykowy Poznan - Szkola Jezykow Obcych', '728392817', 'pjezyki@sjo.com'),
+(38, 5, 'Wedliny Zbojnik', '372829382', 'zbojnikwedliny@domena.com'),
 (39, 6, 'Marcel Mich - Kursy Pszczelarskie', '728293019', 'pszczelarz.kobylnica@lk.lk'),
-(40, 6, 'NordicWalking nad Prosną', '283928382', 'prosna.wycieczki@domena.com'),
-(41, 4, 'Drzwi i Okna Poznań - Winogrady', '738298371', 'winogrady.firma@domena.com'),
-(42, 8, 'Mokotów - Przeprowadzka dla Ciebie' , '746294029', 'moko_przepro@domena.com'),
-(43, 8, 'Piekarnia WP - Wypieki Pawła', '758392823', 'wppiekarnia@domena.com'),
-(44, 9, 'O Polu i Dworze - Wycieczki w Przeszłość', '485938493', 'opole.historia@mi.pl'),
+(40, 6, 'NordicWalking nad Prosna', '283928382', 'prosna.wycieczki@domena.com'),
+(41, 4, 'Drzwi i Okna Poznan - Winogrady', '738298371', 'winogrady.firma@domena.com'),
+(42, 8, 'Mokotow - Przeprowadzka dla Ciebie' , '746294029', 'moko_przepro@domena.com'),
+(43, 8, 'Piekarnia WP - Wypieki Pawla', '758392823', 'wppiekarnia@domena.com'),
+(44, 9, 'O Polu i Dworze - Wycieczki w Przeszlosc', '485938493', 'opole.historia@mi.pl'),
 (45, 9, 'UKS Opolanka Opole', '849302938', 'opolankaopole.pilka@gh.com'),
 (46, 11, 'Parafia Opole', '389230299', 'parafia_opole@domena.com'),
 (47, 10, 'Wojciech Mirko - Zdun', '189930298', 'zdun.opole@lk.kl'),
-(48, 12, 'Elektryka dla Bzika - Koło Młodych Fizyków', '849283928', 'kmf.edb@mi.pl'),
-(49, 12, 'Miłosz Mila - Fotografia', '827391029', 'mmfoto@kielce.pl'),
-(50, 12, 'Tanie Kieleckie Taksówki', '382910392', 'tkt@domena.com'),
-(51, 12, 'Robert - Przewóz Osób', '829102938', 'rpo@lk.kl'),
+(48, 12, 'Elektryka dla Bzika - Kolo Mlodych Fizykow', '849283928', 'kmf.edb@mi.pl'),
+(49, 12, 'Milosz Mila - Fotografia', '827391029', 'mmfoto@kielce.pl'),
+(50, 12, 'Tanie Kieleckie Taksowki', '382910392', 'tkt@domena.com'),
+(51, 12, 'Robert - Przewoz Osob', '829102938', 'rpo@lk.kl'),
 (52, 12, 'Szyk i Styl - Fryzjer Kielce', '829019283', 'sisfk@mi.pl'),
-(53, 14, 'Korepetycje - Dębica', '823749039', 'debica.korepetycje.pl'),
+(53, 14, 'Korepetycje - Debica', '823749039', 'debica.korepetycje.pl'),
 (54, 14, 'Szewc Dratewka', '798345789', 'dratwa.szewc12@domena.com'),
 (55, 15, 'Ludwisarz - Szybko, Tanio, z Humorem', NULL, 'ludwisarz.debica@domena.com')
 ;
@@ -493,7 +493,7 @@ CREATE TABLE samochody
 	CHECK((nowy='TAK' AND przebieg is null) OR (nowy='NIE' AND przebieg is distinct from NULL)),
 	CHECK(bezwypadkowy='TAK' OR bezwypadkowy='NIE'),
 	CHECK(silnik IN('benzyna','diesel','hybryda','gaz','elektryczny')),
-	CHECK(skrzynia_biegow='automatyczna' OR skrzynia_biegow='manualna' OR skrzynia_biegow='CVT' OR skrzynia_biegow='półautomatyczna'),
+	CHECK(skrzynia_biegow='automatyczna' OR skrzynia_biegow='manualna' OR skrzynia_biegow='CVT' OR skrzynia_biegow='polautomatyczna'),
 	CHECK((nowy='TAK' AND id_klienta is NULL AND bezwypadkowy is NULL) OR (nowy='NIE' AND id_klienta is distinct from NULL AND bezwypadkowy is distinct from NULL)),
 	CHECK((silnik_moc_KM is distinct from NULL AND silnik_moc_kW is distinct from NULL AND silnik_moc_kW<silnik_moc_KM) OR (silnik_moc_KM is distinct from NULL OR silnik_moc_kW is distinct from NULL))
 );
@@ -519,13 +519,13 @@ insert into samochody(id_salon, id_model,id_samochodu,cena,nowy,liczba_drzwi,kol
 rok_produkcji,liczba_miejsc,id_naped,silnik,spalanie,skrzynia_biegow,liczba_biegow,
 silnik_moc_KM,predkosc_max,id_typ,przyspieszenie, id_klienta, przebieg, bezwypadkowy) values
 (1, 10, 11, 34000, 'NIE',  5, 'zielony', 14, 2016, 5, 3,  'hybryda',  6.6, 'manualna', 6, 223, 210, 3, 8.3, 4, 67000, 'NIE'),
-(6, 10, 12, 19200, 'NIE', 5, 'biały', 16, 2015, 5, 3, 'benzyna', 7.0, 'manualna', 6, 245, 210, 3, 8.3, 27, 84000, 'TAK'),
-(4, 10, 13, 49000, 'NIE', 5, 'żółty', 15, 2017, 5, 3, 'diesel', 6.0, 'automatyczna', 6, 169, 190, 3, 9.3, 7, 59000, 'TAK'),
+(6, 10, 12, 19200, 'NIE', 5, 'bialy', 16, 2015, 5, 3, 'benzyna', 7.0, 'manualna', 6, 245, 210, 3, 8.3, 27, 84000, 'TAK'),
+(4, 10, 13, 49000, 'NIE', 5, 'zolty', 15, 2017, 5, 3, 'diesel', 6.0, 'automatyczna', 6, 169, 190, 3, 9.3, 7, 59000, 'TAK'),
 (5, 3, 14, 35900, 'NIE', 5, 'bordowy', 2, 2017, 5, 1, 'benzyna', 7.2, 'manualna', 6, 184, 212, 1, 8.1, 24, 57000, 'TAK'),
 (2, 3, 15, 27000, 'NIE', 5, 'czarny', 3, 2017, 5, 1, 'diesel', 5.4, 'automatyczna', 8, 190, 212, 1, 8.0, 7, 70000, 'NIE'),
-(1, 3, 16, 45300, 'NIE', 5, 'pomarańczowy', 4, 2018, 5, 1,'benzyna', 8.6, 'manualna', 6, 360, 250, 1, 4.9, 9, 39000, 'TAK'),
+(1, 3, 16, 45300, 'NIE', 5, 'pomaranczowy', 4, 2018, 5, 1,'benzyna', 8.6, 'manualna', 6, 360, 250, 1, 4.9, 9, 39000, 'TAK'),
 (5, 4, 17, 22900, 'NIE', 5, 'srebrny', 1, 2006, 5, 1, 'benzyna', 9.0, 'automatyczna', 5, 231, 202, 1, 8.5, 27, 98000, 'TAK'),
-(5, 4, 18, 17800, 'NIE', 5, 'błękitny', 1, 2002, 5, 1, 'diesel', 6.6, 'manualna', 6, 184, 200, 1, 10.1, 26, 112000, 'TAK'),
+(5, 4, 18, 17800, 'NIE', 5, 'blekitny', 1, 2002, 5, 1, 'diesel', 6.6, 'manualna', 6, 184, 200, 1, 10.1, 26, 112000, 'TAK'),
 (2, 5, 19, 23000, 'NIE', 5, 'szary', 1, 2008, 5, 1, 'benzyna', 11.0, 'manualna', 6, 306, 240, 1, 6.7, 36, 97000, 'TAK'),
 (2, 5, 20, 17000, 'NIE', 5, 'szary', 1, 2008, 5, 1, 'benzyna', 11.0, 'manualna', 6, 306, 240, 1, 6.7, 36, 94300, 'NIE'),
 (2, 5, 21, 18500, 'NIE', 5, 'szary', 1, 2008, 5, 1, 'benzyna', 11.0, 'manualna', 6, 306, 240, 1, 6.7, 36, 102500, 'TAK'),
@@ -561,7 +561,7 @@ insert into samochody (id_salon, id_model,id_samochodu,cena,nowy,liczba_drzwi,ko
 rok_produkcji,liczba_miejsc,id_naped,silnik,spalanie,silnik_moc_kW,
 silnik_moc_KM,predkosc_max,id_typ,przyspieszenie) values 
 (1, 14,6,159000,'TAK',4,'niebieski',14,2020,4,3,'elektryczny',0,125,170,150,6,7.3),
-(1, 15,7,617136,'TAK',4,'biały',8,2020,4,1,'elektryczny',0,460,625,260,3,3.2)
+(1, 15,7,617136,'TAK',4,'bialy',8,2020,4,1,'elektryczny',0,460,625,260,3,3.2)
 ;
 
 drop table if exists historia_transakcji cascade;
@@ -589,14 +589,14 @@ insert into historia_transakcji(id_transakcji, id_salon, id_modelu, data_transak
 (7, 1, 3, '2019-07-10', 38900, 'NIE',  9, NULL),
 (8, 1, 7, '2019-07-13', 3400, 'NIE', 28, NULL),
 (9, 2, 3, '2019-07-14', 24900, 'NIE',  7, 'otwarcie drugiej filii'),
-(10, 2, 5, '2019-07-23', 19000, 'NIE', 36, 'pierwszy z czterech BMW - transakcja Rusałka - Kajaki'),
+(10, 2, 5, '2019-07-23', 19000, 'NIE', 36, 'pierwszy z czterech BMW - transakcja Rusalka - Kajaki'),
 (11, 2, 5, '2019-07-23', 17500, 'NIE', 36, NULL),
 (12, 2, 5, '2019-07-23', 16000, 'NIE', 36, NULL),
 (13, 2, 5, '2019-07-24', 15000, 'NIE', 36, NULL),
 (14, 1, 9, '2019-08-01', 17900, 'TAK',  31, NULL),
-(15, 2, 15, '2019-08-02', 23000, 'TAK', 40, 'nawiązanie współpracy z NW Nad Prosną'),
+(15, 2, 15, '2019-08-02', 23000, 'TAK', 40, 'nawiazanie wspolpracy z NW Nad Prosna'),
 (16, 2, 7, '2019-08-09', 1900, 'NIE', 7, NULL),
-(17, 3, 8, '2019-08-24', 52900, 'TAK', 42, 'Warszawa - pierwsza sprzedaż'),
+(17, 3, 8, '2019-08-24', 52900, 'TAK', 42, 'Warszawa - pierwsza sprzedaz'),
 (18, 4, 10, '2019-08-31', 36000, 'NIE', 7, NULL),
 (19, 1, 11, '2019-08-31', 39300, 'TAK', 7, NULL),
 (20, 5, 4, '2019-09-11', 20000, 'NIE', 27, NULL),
