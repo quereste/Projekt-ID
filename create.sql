@@ -280,15 +280,6 @@ CREATE TABLE kierownicy(
 	telefon varchar (25) NOT NULL
 );
 
-insert into kierownicy(id_kierownika, imie, nazwisko, telefon) values
-(10, 'Marcel', 'Buda', '293819292'),
-(11, 'Mira', 'Len', '218398293'),
-(14, 'Janina', 'Krucien', '129389382'),
-(23, 'Leon', 'Modrzejski', '943939203'),
-(25, 'Nikodem', 'Pyksa', '723939029'),
-(15, 'Kamil', 'Berko', '839290291')
-;
-
 CREATE TYPE bool_enum AS ENUM ('TAK','NIE');
 
 drop table if exists salon cascade;
@@ -328,6 +319,144 @@ CREATE TABLE salon
 	OR (otwarcie_sb IS NOT NULL AND zamkniecie_sb IS NOT NULL AND otwarcie_sb < zamkniecie_sb))
 );
 
+drop table if exists doradcy cascade;
+CREATE TABLE doradcy
+(
+	id_doradcy numeric(6) PRIMARY KEY,
+	id_salon numeric(4) REFERENCES salon NOT NULL,
+	imie varchar(20) NOT NULL,
+	nazwisko varchar(30) NOT NULL,
+	telefon varchar(25) NOT NULL,
+	email varchar(50) NOT NULL
+);
+
+drop table if exists klienci_salonu cascade;
+CREATE TABLE klienci_salonu
+(
+	id_klienta numeric(8) PRIMARY KEY,
+	id_doradcy numeric(6) REFERENCES doradcy,
+	imie varchar(20),
+	nazwisko varchar(30),
+	nazwa varchar(100),
+	telefon varchar(25),
+	email varchar(50),
+	newsletter bool_enum NOT NULL,
+
+	CHECK (telefon IS NOT NULL OR email IS NOT NULL),
+	CHECK((imie IS NOT NULL AND nazwisko IS NOT NULL) OR nazwa IS NOT NULL),
+	CHECK((newsletter='TAK' AND email IS NOT NULL) OR newsletter='NIE')
+);
+
+CREATE TYPE skrzynia_enum AS ENUM ('automatyczna','manualna','CVT','polautomatyczna');
+CREATE TYPE silnik_enum AS ENUM ('benzyna','diesel','hybryda','gaz','elektryczny');
+
+drop table if exists samochody cascade;
+CREATE TABLE samochody
+(
+	id_samochodu numeric(10) PRIMARY KEY,
+	id_model numeric(8) REFERENCES modele NOT NULL,
+	id_klienta numeric(8) REFERENCES klienci_salonu, 
+	id_wyposazenie numeric(10) REFERENCES wyposazenie,
+	id_salon numeric(4) REFERENCES salon NOT NULL,
+	rok_produkcji numeric(4) NOT NULL,
+	cena numeric(10,2) NOT NULL,
+	nowy char(3) NOT NULL,
+	liczba_miejsc numeric(2),
+	liczba_drzwi numeric(2),
+	id_naped numeric(2) REFERENCES rodzaj_napedu NOT NULL,
+	silnik silnik_enum NOT NULL,
+	przebieg numeric(10),
+	silnik_moc_KM numeric(3),
+	silnik_moc_kW numeric(3),
+	pojemnosc_silnika numeric(4),
+	kolor varchar(20) NOT NULL,
+	skrzynia_biegow skrzynia_enum,
+	spalanie numeric(3,1),
+	bezwypadkowy bool_enum,
+	predkosc_max numeric(3),
+	liczba_biegow numeric(2),
+	id_typ numeric(2) REFERENCES typ NOT NULL,
+	przyspieszenie numeric(3,1),
+
+	CHECK((nowy='TAK' AND przebieg is null) OR (nowy='NIE' AND przebieg is distinct from NULL)),
+	CHECK((nowy='TAK' AND id_klienta is NULL AND bezwypadkowy is NULL) OR (nowy='NIE' AND id_klienta is distinct from NULL AND bezwypadkowy is distinct from NULL)),
+	CHECK((silnik_moc_KM is distinct from NULL AND silnik_moc_kW is distinct from NULL AND silnik_moc_kW<silnik_moc_KM) OR (silnik_moc_KM is distinct from NULL OR silnik_moc_kW is distinct from NULL))
+);
+
+drop table if exists historia_transakcji cascade;
+CREATE TABLE historia_transakcji
+(
+        id_transakcji numeric(10) PRIMARY KEY,
+	id_salon numeric(4) REFERENCES salon,
+        id_modelu numeric(4) REFERENCES modele,
+        data_transakcji date NOT NULL,
+        wartosc_transakcji numeric(10) NOT NULL,
+        sprzedaz bool_enum NOT NULL,
+        id_klienta numeric(6) REFERENCES klienci_salonu,
+        komentarz varchar(1000),
+
+	CHECK(id_klienta IS NOT NULL)
+);
+
+--jedna adres email moze zostac tylko raz podany
+CREATE OR REPLACE FUNCTION email_uni() RETURNS trigger AS $email_uni$
+BEGIN
+    IF New.email is distinct from null THEN
+        IF (Select count(*) from klienci_salonu where email=NEW.email)>0 then
+            RAISE exception 'Tego adresu email uzywa juz ktos inny';
+        END IF;
+
+        IF (Select count(*) from doradcy where email=NEW.email)>0 then
+            RAISE exception 'Tego adresu email uzywa juz ktos inny';
+        END IF;
+    END IF;
+
+  RETURN NEW;
+END;
+$email_uni$ LANGUAGE plpgsql;
+
+--jeden numer telefonu moze zostac tylko raz podany
+CREATE OR REPLACE FUNCTION telefon_uni() RETURNS trigger AS $telefon_uni$
+BEGIN
+    IF New.telefon is distinct from null THEN
+
+        IF (Select count(*) from klienci_salonu where telefon=NEW.telefon)>0 then
+            RAISE exception 'Tego numeru telefonu uzywa juz ktos inny';
+        END IF;
+
+        IF (Select count(*) from doradcy where telefon=NEW.telefon)>0 then
+            RAISE exception 'Tego numeru telefonu uzywa juz ktos inny';
+        END IF;
+
+        IF (Select count(*) from salon where telefon=NEW.telefon)>0 then
+            RAISE exception 'Tego numeru telefonu uzywa juz ktos inny';
+        END IF;
+
+        IF (Select count(*) from kierownicy where telefon=NEW.telefon)>0 then
+            RAISE exception 'Tego numeru telefonu uzywa juz ktos inny';
+        END IF;
+
+    END IF;
+
+  RETURN NEW;
+END;
+$telefon_uni$ LANGUAGE plpgsql;
+
+CREATE TRIGGER telefon_uni BEFORE INSERT OR UPDATE ON kierownicy
+FOR EACH ROW EXECUTE PROCEDURE telefon_uni();
+
+insert into kierownicy(id_kierownika, imie, nazwisko, telefon) values
+(10, 'Marcel', 'Buda', '293819292'),
+(11, 'Mira', 'Len', '218398293'),
+(14, 'Janina', 'Krucien', '129389382'),
+(23, 'Leon', 'Modrzejski', '943939203'),
+(25, 'Nikodem', 'Pyksa', '723939029'),
+(15, 'Kamil', 'Berko', '839290291')
+;
+
+CREATE TRIGGER telefon_uni BEFORE INSERT OR UPDATE ON salon
+FOR EACH ROW EXECUTE PROCEDURE telefon_uni();
+
 insert into salon (id_salon, miasto, kod_pocztowy, adres, telefon, id_kierownika, tylko_nowe,
 		otwarcie_pon, zamkniecie_pon,
 		otwarcie_wt, zamkniecie_wt,
@@ -349,36 +478,11 @@ insert into salon (id_salon, miasto, kod_pocztowy, adres, telefon, id_kierownika
 	'08:00:00', '18:30:00','07:30:00', '17:45:00','08:00:00', '09:30:00', '09:00:00', '13:30:00')
 ;
 
-drop table if exists doradcy cascade;
-CREATE TABLE doradcy
-(
-	id_doradcy numeric(6) PRIMARY KEY,
-	id_salon numeric(4) REFERENCES salon NOT NULL,
-	imie varchar(20) NOT NULL,
-	nazwisko varchar(30) NOT NULL,
-	telefon varchar(25) NOT NULL,
-	email varchar(50) NOT NULL
-);
-
---jeden adres email moze byc przypisany tylko do jednej osoby
-CREATE OR REPLACE FUNCTION email_uni() RETURNS trigger AS $email_uni$
-BEGIN
-    IF New.email is distinct from null THEN
-        IF (Select count(*) from klienci_salonu where email=NEW.email)>0 then
-            RAISE exception 'Tego adresu email uzywa juz ktos inny';
-        END IF;
-
-        IF (Select count(*) from doradcy where email=NEW.email)>0 then
-            RAISE exception 'Tego adresu email uzywa juz ktos inny';
-        END IF;
-    END IF;
-
-  RETURN NEW;
-END;
-$email_uni$ LANGUAGE plpgsql;
-
 CREATE TRIGGER email_uni BEFORE INSERT OR UPDATE ON doradcy
 FOR EACH ROW EXECUTE PROCEDURE email_uni();
+
+CREATE TRIGGER telefon_uni BEFORE INSERT OR UPDATE ON doradcy
+FOR EACH ROW EXECUTE PROCEDURE telefon_uni();
 
 insert into doradcy(id_doradcy, id_salon, imie, nazwisko, telefon, email) values
 (1, 1, 'Michal', 'Radowicz', '815921910', 'rad_dla_porad@salon.com'),
@@ -398,25 +502,11 @@ insert into doradcy(id_doradcy, id_salon, imie, nazwisko, telefon, email) values
 (15, 6, 'Mikolaj', 'Zasiecki', '273817388', 'mzasiek@salon.com')
 ;
 
-drop table if exists klienci_salonu cascade;
-CREATE TABLE klienci_salonu
-(
-	id_klienta numeric(8) PRIMARY KEY,
-	id_doradcy numeric(6) REFERENCES doradcy,
-	imie varchar(20),
-	nazwisko varchar(30),
-	nazwa varchar(100),
-	telefon varchar(25),
-	email varchar(50),
-	newsletter bool_enum NOT NULL,
-
-	CHECK (telefon IS NOT NULL OR email IS NOT NULL),
-	CHECK((imie IS NOT NULL AND nazwisko IS NOT NULL) OR nazwa IS NOT NULL),
-	CHECK((newsletter='TAK' AND email IS NOT NULL) OR newsletter='NIE')
-);
-
 CREATE TRIGGER email_uni BEFORE INSERT OR UPDATE ON klienci_salonu
 FOR EACH ROW EXECUTE PROCEDURE email_uni();
+
+CREATE TRIGGER telefon_uni BEFORE INSERT OR UPDATE ON klienci_salonu
+FOR EACH ROW EXECUTE PROCEDURE telefon_uni();
 
 insert into klienci_salonu(id_klienta, id_doradcy, imie, nazwisko, telefon, email,newsletter) values
 (1, 3, 'Marek', 'Wozidlo', '859382712', NULL,'NIE'),
@@ -435,7 +525,7 @@ insert into klienci_salonu(id_klienta, id_doradcy, imie, nazwisko, telefon, emai
 (14, 1, 'Lidia', 'Andrzejewna', NULL, 'landrzejewna@domena.com', 'TAK'),
 (15, 13, 'Filip', 'Steff', NULL, 'fsteff@dk.kl', 'TAK'),
 (16, 4, 'Kamil', 'Drzazga', NULL, 'kdrzazga@domena.com', 'TAK'),
-(17, 3, 'Witold', 'Urbanowicz', '281928172', 'fi_mail_3@mi.pl','NIE'),
+(17, 3, 'Witold', 'Urbanowicz', '281928173', 'fi_mail_3@mi.pl','NIE'),
 (18, 9, 'Artur', 'Mic', '128374382', 'amicki@domena.com', 'TAK'),
 (19, 10, 'Nikodem', 'Potocki', '827102918', 'nipotocki@lk.kl', 'TAK'),
 (20, 2, 'Maria', 'Olisz', '283918291', 'marysolisz@domena.com', 'TAK'),
@@ -478,42 +568,6 @@ insert into klienci_salonu(id_klienta, id_doradcy, nazwa, telefon, email,newslet
 (54, 14, 'Szewc Dratewka', '798345789', 'dratwa.szewc12@domena.com', 'TAK'),
 (55, 15, 'Ludwisarz - Szybko, Tanio, z Humorem', NULL, 'ludwisarz.debica@domena.com','NIE')
 ;
-
-CREATE TYPE skrzynia_enum AS ENUM ('automatyczna','manualna','CVT','polautomatyczna');
-CREATE TYPE silnik_enum AS ENUM ('benzyna','diesel','hybryda','gaz','elektryczny');
-
-drop table if exists samochody cascade;
-CREATE TABLE samochody
-(
-	id_samochodu numeric(10) PRIMARY KEY,
-	id_model numeric(8) REFERENCES modele NOT NULL,
-	id_klienta numeric(8) REFERENCES klienci_salonu, 
-	id_wyposazenie numeric(10) REFERENCES wyposazenie,
-	id_salon numeric(4) REFERENCES salon NOT NULL,
-	rok_produkcji numeric(4) NOT NULL,
-	cena numeric(10,2) NOT NULL,
-	nowy char(3) NOT NULL,
-	liczba_miejsc numeric(2),
-	liczba_drzwi numeric(2),
-	id_naped numeric(2) REFERENCES rodzaj_napedu NOT NULL,
-	silnik silnik_enum NOT NULL,
-	przebieg numeric(10),
-	silnik_moc_KM numeric(3),
-	silnik_moc_kW numeric(3),
-	pojemnosc_silnika numeric(4),
-	kolor varchar(20) NOT NULL,
-	skrzynia_biegow skrzynia_enum,
-	spalanie numeric(3,1),
-	bezwypadkowy bool_enum,
-	predkosc_max numeric(3),
-	liczba_biegow numeric(2),
-	id_typ numeric(2) REFERENCES typ NOT NULL,
-	przyspieszenie numeric(3,1),
-
-	CHECK((nowy='TAK' AND przebieg is null) OR (nowy='NIE' AND przebieg is distinct from NULL)),
-	CHECK((nowy='TAK' AND id_klienta is NULL AND bezwypadkowy is NULL) OR (nowy='NIE' AND id_klienta is distinct from NULL AND bezwypadkowy is distinct from NULL)),
-	CHECK((silnik_moc_KM is distinct from NULL AND silnik_moc_kW is distinct from NULL AND silnik_moc_kW<silnik_moc_KM) OR (silnik_moc_KM is distinct from NULL OR silnik_moc_kW is distinct from NULL))
-);
 
 --automatycznie uzupelnia moc silnika wyrazona w innych jednostkach
 CREATE OR REPLACE FUNCTION KM_kW() RETURNS trigger AS $KM_kW$
@@ -596,20 +650,6 @@ silnik_moc_KM,predkosc_max,id_typ,przyspieszenie) values
 (1, 15,7,617136,'TAK',4,'bialy',8,2020,4,1,'elektryczny',0,460,625,260,3,3.2)
 ;
 
-drop table if exists historia_transakcji cascade;
-CREATE TABLE historia_transakcji
-(
-        id_transakcji numeric(10) PRIMARY KEY,
-	id_salon numeric(4) REFERENCES salon,
-        id_modelu numeric(4) REFERENCES modele,
-        data_transakcji date NOT NULL,
-        wartosc_transakcji numeric(10) NOT NULL,
-        sprzedaz bool_enum NOT NULL,
-        id_klienta numeric(6) REFERENCES klienci_salonu,
-        komentarz varchar(1000),
-
-	CHECK(id_klienta IS NOT NULL)
-);
 insert into historia_transakcji(id_transakcji, id_salon, id_modelu, data_transakcji, wartosc_transakcji, sprzedaz, id_klienta, komentarz) values
 (1, 1, 1, '2019-05-31', 34000, 'TAK', 1, 'pierwsza sprzedaz'),
 (2, 1, 1, '2019-06-03', 27000, 'TAK', 7, NULL),
@@ -637,3 +677,4 @@ insert into historia_transakcji(id_transakcji, id_salon, id_modelu, data_transak
 (24, 6, 10, '2019-10-01', 17200, 'NIE', 27, NULL),
 (25, 6, 7, '2019-10-03', 3500, 'NIE', 29, NULL)
 	;
+
