@@ -337,8 +337,7 @@ insert into salon (id_salon, miasto, kod_pocztowy, adres, telefon, id_kierownika
 (1,'Krakow', '30-749', 'ul. Bieszczadzka 23', '124560323', 10, 'NIE','09:00:00', '17:00:00',
 	'10:00:00', '16:00:00', NULL, NULL,'08:00:00', '18:00:00',NULL, NULL,
 	'08:00:00', '13:00:00'),
-(2,'Poznan', '60-104', 'ul. Zacisze 2', '617292031', 11, 'NIE', NULL, NULL, '09:00:00', '17:00:00',
-	'09:00:00', '19:00:00','08:30:00', '17:30:00', NULL, NULL, NULL, NULL),	
+(2,'Poznan', '60-104', 'ul. Zacisze 2', '617292031', 11, 'NIE', NULL, NULL, '09:00:00', 	'17:00:00','09:00:00', '19:00:00','08:30:00', '17:30:00', NULL, NULL, NULL, NULL),	
 (3,'Warszawa', '00-008', 'ul. Krasna 124', '220192031', 14, 'TAK','12:00:00', '18:00:00',
 	'09:00:00', '16:00:00', '09:00:00', '19:00:00','13:00:00', '19:30:00',NULL,NULL, NULL,NULL),
 (4,'Opole', '45-001', 'ul. Zarzecze 9', '771231231', 23, 'NIE', NULL, NULL,NULL, NULL,
@@ -506,6 +505,20 @@ $KM_kW$ LANGUAGE plpgsql;
 
 CREATE TRIGGER KM_kW BEFORE INSERT OR UPDATE ON samochody
 FOR EACH ROW EXECUTE PROCEDURE KM_kW();
+
+
+CREATE OR REPLACE FUNCTION uzywany() RETURNS trigger AS $uzywany$
+BEGIN
+    IF (New.nowy='NIE' AND (Select tylko_nowe from salon where id_salon=NEW.id_salon)='TAK') then
+        RAISE exception 'Samochod jest uzywany, a salon sprzedaje tylko samochody nowe';
+    END IF;
+
+  RETURN NEW;
+END;
+$uzywany$ LANGUAGE plpgsql;
+
+CREATE TRIGGER uzywany BEFORE INSERT OR UPDATE ON samochody
+FOR EACH ROW EXECUTE PROCEDURE uzywany();
 
 insert into samochody(id_salon, id_model,id_samochodu,cena,nowy,liczba_drzwi,kolor,id_wyposazenie,
 rok_produkcji,liczba_miejsc,id_naped,silnik,spalanie,skrzynia_biegow,liczba_biegow,
