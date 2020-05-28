@@ -360,6 +360,26 @@ CREATE TABLE doradcy
 	email varchar(50) NOT NULL
 );
 
+--jeden adres email moze byc przypisany tylko do jednej osoby
+CREATE OR REPLACE FUNCTION email_uni() RETURNS trigger AS $email_uni$
+BEGIN
+    IF New.email is distinct from null THEN
+        IF (Select count(*) from klienci_salonu where email=NEW.email)>0 then
+            RAISE exception 'Tego adresu email uzywa juz ktos inny';
+        END IF;
+
+        IF (Select count(*) from doradcy where email=NEW.email)>0 then
+            RAISE exception 'Tego adresu email uzywa juz ktos inny';
+        END IF;
+    END IF;
+
+  RETURN NEW;
+END;
+$email_uni$ LANGUAGE plpgsql;
+
+CREATE TRIGGER email_uni BEFORE INSERT OR UPDATE ON doradcy
+FOR EACH ROW EXECUTE PROCEDURE email_uni();
+
 insert into doradcy(id_doradcy, id_salon, imie, nazwisko, telefon, email) values
 (1, 1, 'Michal', 'Radowicz', '815921910', 'rad_dla_porad@salon.com'),
 (2, 1, 'Wojciech', 'Praskiniuk', '603495392', 'wpraskiniuk_salon@salon.com'),
@@ -394,6 +414,9 @@ CREATE TABLE klienci_salonu
 	CHECK((imie IS NOT NULL AND nazwisko IS NOT NULL) OR nazwa IS NOT NULL),
 	CHECK((newsletter='TAK' AND email IS NOT NULL) OR newsletter='NIE')
 );
+
+CREATE TRIGGER email_uni BEFORE INSERT OR UPDATE ON klienci_salonu
+FOR EACH ROW EXECUTE PROCEDURE email_uni();
 
 insert into klienci_salonu(id_klienta, id_doradcy, imie, nazwisko, telefon, email,newsletter) values
 (1, 3, 'Marek', 'Wozidlo', '859382712', NULL,'NIE'),
@@ -492,6 +515,7 @@ CREATE TABLE samochody
 	CHECK((silnik_moc_KM is distinct from NULL AND silnik_moc_kW is distinct from NULL AND silnik_moc_kW<silnik_moc_KM) OR (silnik_moc_KM is distinct from NULL OR silnik_moc_kW is distinct from NULL))
 );
 
+--automatycznie uzupelnia moc silnika wyrazona w innych jednostkach
 CREATE OR REPLACE FUNCTION KM_kW() RETURNS trigger AS $KM_kW$
 BEGIN
   IF NEW.silnik_moc_KM is null then
@@ -509,7 +533,7 @@ $KM_kW$ LANGUAGE plpgsql;
 CREATE TRIGGER KM_kW BEFORE INSERT OR UPDATE ON samochody
 FOR EACH ROW EXECUTE PROCEDURE KM_kW();
 
-
+--uzywany samochod nie moze byc przypisany do salonu ktory ma tylko asmochody nowe
 CREATE OR REPLACE FUNCTION uzywany() RETURNS trigger AS $uzywany$
 BEGIN
     IF (New.nowy='NIE' AND (Select tylko_nowe from salon where id_salon=NEW.id_salon)='TAK') then
