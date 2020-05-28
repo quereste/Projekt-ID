@@ -298,63 +298,55 @@ CREATE TABLE salon
 	adres varchar(50),
 	telefon varchar(25),
 	id_kierownika numeric(2) REFERENCES kierownicy NOT NULL,
-	tylko_nowe char(3), 
-	otwarte_pon char(3),
+	tylko_nowe char(3) NOT NULL, 
 	otwarcie_pon time,
 	zamkniecie_pon time,
-	otwarte_wt char(3),
 	otwarcie_wt time,
 	zamkniecie_wt time,
-	otwarte_sro char(3),
 	otwarcie_sro time,
 	zamkniecie_sro time,
-	otwarte_czw char(3),
 	otwarcie_czw time,
 	zamkniecie_czw time,
-	otwarte_pt char(3),
 	otwarcie_pt time,
 	zamkniecie_pt time,
-	otwarte_sb char(3),
 	otwarcie_sb time,
 	zamkniecie_sb time,
 	
-	CHECK ((otwarte_pon='NIE' AND otwarcie_pon IS NULL AND zamkniecie_pon IS NULL) 
-	OR (otwarte_pon='TAK' AND otwarcie_pon IS NOT NULL AND zamkniecie_pon IS NOT NULL AND otwarcie_pon < zamkniecie_pon)),
-	CHECK ((otwarte_wt='NIE' AND otwarcie_wt IS NULL AND zamkniecie_wt IS NULL) 
-	OR (otwarte_wt='TAK' AND otwarcie_wt IS NOT NULL AND zamkniecie_wt IS NOT NULL AND otwarcie_wt < zamkniecie_wt)),
-	CHECK ((otwarte_sro='NIE' AND otwarcie_sro IS NULL AND zamkniecie_sro IS NULL) 
-	OR (otwarte_sro='TAK' AND otwarcie_sro IS NOT NULL AND zamkniecie_sro IS NOT NULL AND otwarcie_sro < zamkniecie_sro)),
-	CHECK ((otwarte_czw='NIE' AND otwarcie_czw IS NULL AND zamkniecie_czw IS NULL) 
-	OR (otwarte_czw='TAK' AND otwarcie_czw IS NOT NULL AND zamkniecie_czw IS NOT NULL AND otwarcie_czw < zamkniecie_czw)),
-	CHECK ((otwarte_pt='NIE' AND otwarcie_pt IS NULL AND zamkniecie_pt IS NULL) 
-	OR (otwarte_pt='TAK' AND otwarcie_pt IS NOT NULL AND zamkniecie_pt IS NOT NULL AND otwarcie_pt < zamkniecie_pt)),
-	CHECK ((otwarte_sb='NIE' AND otwarcie_sb IS NULL AND zamkniecie_sb IS NULL) 
-	OR (otwarte_sb='TAK' AND otwarcie_sb IS NOT NULL AND zamkniecie_sb IS NOT NULL AND otwarcie_sb < zamkniecie_sb)),
+	CHECK ((otwarcie_pon IS NULL AND zamkniecie_pon IS NULL) 
+	OR (otwarcie_pon IS NOT NULL AND zamkniecie_pon IS NOT NULL AND otwarcie_pon < zamkniecie_pon)),
+	CHECK ((otwarcie_wt IS NULL AND zamkniecie_wt IS NULL) 
+	OR (otwarcie_wt IS NOT NULL AND zamkniecie_wt IS NOT NULL AND otwarcie_wt < zamkniecie_wt)),
+	CHECK ((otwarcie_sro IS NULL AND zamkniecie_sro IS NULL) 
+	OR (otwarcie_sro IS NOT NULL AND zamkniecie_sro IS NOT NULL AND otwarcie_sro < zamkniecie_sro)),
+	CHECK ((otwarcie_czw IS NULL AND zamkniecie_czw IS NULL) 
+	OR (otwarcie_czw IS NOT NULL AND zamkniecie_czw IS NOT NULL AND otwarcie_czw < zamkniecie_czw)),
+	CHECK ((otwarcie_pt IS NULL AND zamkniecie_pt IS NULL) 
+	OR (otwarcie_pt IS NOT NULL AND zamkniecie_pt IS NOT NULL AND otwarcie_pt < zamkniecie_pt)),
+	CHECK ((otwarcie_sb IS NULL AND zamkniecie_sb IS NULL) 
+	OR (otwarcie_sb IS NOT NULL AND zamkniecie_sb IS NOT NULL AND otwarcie_sb < zamkniecie_sb)),
 	CHECK(tylko_nowe='TAK' OR tylko_nowe='NIE')
 );
 
---dodaa godziny oraz dni otwarcia salonu
-
 insert into salon (id_salon, miasto, kod_pocztowy, adres, telefon, id_kierownika, tylko_nowe,
-		otwarte_pon, otwarcie_pon, zamkniecie_pon,
-		otwarte_wt, otwarcie_wt, zamkniecie_wt,
-		otwarte_sro, otwarcie_sro, zamkniecie_sro,
-		otwarte_czw, otwarcie_czw, zamkniecie_czw,
-		otwarte_pt, otwarcie_pt, zamkniecie_pt,
-		otwarte_sb, otwarcie_sb, zamkniecie_sb) values 
-(1,'Krakow', '30-749', 'ul. Bieszczadzka 23', '124560323', 10, 'NIE', 'TAK', '09:00:00', '17:00:00',
-	'TAK', '10:00:00', '16:00:00', 'NIE', NULL, NULL, 'TAK', '08:00:00', '18:00:00', 'NIE', NULL, NULL,
-	'TAK', '08:00:00', '13:00:00'),
-(2,'Poznan', '60-104', 'ul. Zacisze 2', '617292031', 11, 'NIE', 'NIE', NULL, NULL, 'TAK', '09:00:00', '17:00:00',
-	'TAK', '09:00:00', '19:00:00', 'TAK', '08:30:00', '17:30:00', 'NIE', NULL, NULL, 'NIE', NULL, NULL),	
-(3,'Warszawa', '00-008', 'ul. Krasna 124', '220192031', 14, 'TAK', 'TAK', '12:00:00', '18:00:00',
-	'TAK', '09:00:00', '16:00:00', 'TAK', '09:00:00', '19:00:00', 'TAK', '13:00:00', '19:30:00', 'NIE',NULL,NULL, 'NIE', NULL,NULL),
-(4,'Opole', '45-001', 'ul. Zarzecze 9', '771231231', 23, 'NIE', 'NIE', NULL, NULL, 'NIE', NULL, NULL, 'TAK',
-	'08:00:00', '16:30:00', 'TAK', '10:00:00', '19:00:00', 'TAK', '11:00:00', '19:00:00', 'NIE', NULL, NULL),
-(5,'Kielce', '25-241', 'ul. Rzemieslnicza 191', '419210291', 25, 'NIE', 'TAK', '09:00:00', '17:00:00',  'NIE', NULL, NULL,
-	'TAK', '07:30:00', '13:00:00', 'TAK', '09:00:00', '17:00:00', 'NIE', NULL, NULL, 'TAK', '09:00:00', '18:30:00'),
-(6, 'Debica', '39-122', 'ul. 23 Lipca', '142349102', 15, 'NIE', 'TAK', '08:30:00', '17:30:00', 'TAK', '12:00:00', '19:00:00',
-	'TAK', '08:00:00', '18:30:00', 'TAK', '07:30:00', '17:45:00', 'TAK', '08:00:00', '09:30:00', 'TAK', '09:00:00', '13:30:00')
+		otwarcie_pon, zamkniecie_pon,
+		otwarcie_wt, zamkniecie_wt,
+		otwarcie_sro, zamkniecie_sro,
+		otwarcie_czw, zamkniecie_czw,
+		otwarcie_pt, zamkniecie_pt,
+		otwarcie_sb, zamkniecie_sb) values 
+(1,'Krakow', '30-749', 'ul. Bieszczadzka 23', '124560323', 10, 'NIE','09:00:00', '17:00:00',
+	'10:00:00', '16:00:00', NULL, NULL,'08:00:00', '18:00:00',NULL, NULL,
+	'08:00:00', '13:00:00'),
+(2,'Poznan', '60-104', 'ul. Zacisze 2', '617292031', 11, 'NIE', NULL, NULL, '09:00:00', '17:00:00',
+	'09:00:00', '19:00:00','08:30:00', '17:30:00', NULL, NULL, NULL, NULL),	
+(3,'Warszawa', '00-008', 'ul. Krasna 124', '220192031', 14, 'TAK','12:00:00', '18:00:00',
+	'09:00:00', '16:00:00', '09:00:00', '19:00:00','13:00:00', '19:30:00',NULL,NULL, NULL,NULL),
+(4,'Opole', '45-001', 'ul. Zarzecze 9', '771231231', 23, 'NIE', NULL, NULL,NULL, NULL,
+	'08:00:00', '16:30:00','10:00:00', '19:00:00','11:00:00', '19:00:00', NULL, NULL),
+(5,'Kielce', '25-241', 'ul. Rzemieslnicza 191', '419210291', 25, 'NIE','09:00:00', '17:00:00', NULL, NULL,
+	'07:30:00', '13:00:00','09:00:00', '17:00:00',NULL, NULL,'09:00:00', '18:30:00'),
+(6, 'Debica', '39-122', 'ul. 23 Lipca', '142349102', 15, 'NIE','08:30:00', '17:30:00','12:00:00', '19:00:00',
+	'08:00:00', '18:30:00','07:30:00', '17:45:00','08:00:00', '09:30:00', '09:00:00', '13:30:00')
 ;
 
 drop table if exists doradcy cascade;
