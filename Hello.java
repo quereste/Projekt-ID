@@ -33,6 +33,7 @@ public class Hello extends JFrame {
     DefaultTableModel tableModel;
     JScrollPane scroll;
     JTable jTable;
+    JComboBox<String> tabele;
 
     /**
      * @param args
@@ -74,27 +75,25 @@ public class Hello extends JFrame {
 
         buttonOne = new JButton("Wypisz");
         buttonOne.addActionListener(e -> {System.out.println(text.getText());});
-        buttonTwo = new JButton("WyÅ›wietl tabelÄ™");
+        buttonTwo = new JButton("Wyœwietl tabelê");
         //wykonuje zapytanie, a nastepnie je wyswietla
         buttonTwo.addActionListener(e -> {
                     String str;
                     str=text.getText();
+                    str=(String) tabele.getSelectedItem();
                     try {
                         resultSet=statement.executeQuery("select * from "+str);
+                        wypisz();
                      //   resultSet = statement.executeQuery("select m.nazwa, model,silnik,nowy,kolor,w.nazwa,n.nazwa,rok_produkcji as \"rok\",cena,t.nazwa,skrzynia_biegow from samochody left outer join modele using(id_model) left outer join marki m using(id_marka) left outer join wyposazenie w using(id_wyposazenie) left outer join rodzaj_napedu n using(id_naped) left outer join typ t using(id_typ);");
                     } catch (SQLException ex) {
-                        ex.printStackTrace();
-                    }
-                    try {
-                        wypisz();
-                    } catch (SQLException ex) {
-                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(null, "ERROR: Nie istnieje tabela o podanej nazwie: "+str,"",JOptionPane.ERROR_MESSAGE);
+                    //    ex.printStackTrace();
                     }
                 }
         );
 
         //zamyka polaczenie z baza i konczy program
-        buttonTrzy=new JButton("ZakoÅ„cz");
+        buttonTrzy=new JButton("Zakoñcz");
         buttonTrzy.addActionListener(e -> {
             try {
                 connection.close();
@@ -104,17 +103,13 @@ public class Hello extends JFrame {
             System.exit(0);
         });
 
-        lab = new JLabel("Wpisz nazwÄ™ tabeli ktÃ³rÄ… chcesz zobaczyÄ‡: ");
-        JLabel lab2=new JLabel("Na skrÃ³ty: ");
-        JButton button4 = new JButton("DostÄ™pne samochody");
+        lab = new JLabel("Wpisz albo wybierz nazwê tabeli któr¹ chcesz zobaczyæ: ");
+        JLabel lab2=new JLabel("Na skróty: ");
+        JButton button4 = new JButton("Dostêpne samochody");
         //wykonuje zapytanie, a nastepnie je wyswietla
         button4.addActionListener(e -> {
                     try {
                         resultSet = statement.executeQuery("select m.nazwa, model,silnik,nowy,kolor,w.nazwa,n.nazwa,rok_produkcji as \"rok\",cena,t.nazwa,skrzynia_biegow from samochody left outer join modele using(id_model) left outer join marki m using(id_marka) left outer join wyposazenie w using(id_wyposazenie) left outer join rodzaj_napedu n using(id_naped) left outer join typ t using(id_typ);");
-                    } catch (SQLException ex) {
-                        ex.printStackTrace();
-                    }
-                    try {
                         wypisz();
                     } catch (SQLException ex) {
                         ex.printStackTrace();
@@ -139,12 +134,18 @@ public class Hello extends JFrame {
         scroll.setPreferredSize(new Dimension(this.getWidth()-20, scroll.getPreferredSize().height));
         scroll.setVisible(true);
 
+        String[] tabeleTab = {"doradcy","klienci_salonu", "kierownicy","salon","historia_transakcji","samochody", "modele",
+                "marki","wyposazenie","modele_kraje","kraje","modele_wyposazenie","modele_naped","rodzaj_napedu","modele_typ","typ"};
+        tabele = new JComboBox<>(tabeleTab);
+
     //    add(buttonOne);
-        add(buttonTwo);
+     //   add(buttonTwo);
         add(buttonTrzy);
 
         add(lab);
         add(text);
+        add(tabele);
+        add(buttonTwo);
         add(scroll);
         add(lab2);
         add(button4);
