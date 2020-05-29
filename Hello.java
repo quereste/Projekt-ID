@@ -4,6 +4,8 @@ import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.*;
 
 @SuppressWarnings("serial")
@@ -65,7 +67,8 @@ public class Hello extends JFrame {
     }
 
     private void createAndShowGUI() {
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+      //  setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    //    setDefaultCloseOperation(0);
         //rozmiar pierwszego okna
         setSize(600, 600);
         setResizable(true);
@@ -78,9 +81,10 @@ public class Hello extends JFrame {
         buttonTwo = new JButton("Wyœwietl tabelê");
         //wykonuje zapytanie, a nastepnie je wyswietla
         buttonTwo.addActionListener(e -> {
-                    String str;
+                    String str="";
                     str=text.getText();
-                    str=(String) tabele.getSelectedItem();
+                    //jezeli nic nie jest wpisane wtedy pobieramy nazwe z okienka wyboru
+                    if(str.equals("")){str=(String) tabele.getSelectedItem();}
                     try {
                         resultSet=statement.executeQuery("select * from "+str);
                         wypisz();
@@ -97,6 +101,7 @@ public class Hello extends JFrame {
         buttonTrzy.addActionListener(e -> {
             try {
                 connection.close();
+                statement.close();
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
@@ -158,6 +163,18 @@ public class Hello extends JFrame {
                 scroll.setPreferredSize(new Dimension(getWidth()-20, scroll.getPreferredSize().height));
                 //odswieza widok (zmiania szeroksc tabeli)
                 revalidate();
+            }
+        });
+
+        addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent we) {
+                try {
+                    connection.close();
+                    statement.close();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+                System.exit(0);
             }
         });
     }
