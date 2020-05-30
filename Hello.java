@@ -213,6 +213,7 @@ public class Hello extends JFrame {
                     str=text1.getText();
                     try {
                         resultSet = statement.executeQuery(str);
+                        wypisz();
                     } catch (SQLException ex){
                         JOptionPane.showMessageDialog(null, "ERROR: B³êdne polecenie: "+str,"",JOptionPane.ERROR_MESSAGE);
                         ex.printStackTrace();
@@ -251,31 +252,43 @@ public class Hello extends JFrame {
         buttonRemove.addActionListener(new ActionListener()
         {
             public void actionPerformed(ActionEvent e) {
+                boolean wypisz=true;
                 if(jTable.getSelectedRow()+1!=0) {
-                    try {
-                      //  System.out.println(jTable.getSelectedRow() + 1);
-                        resultSet.absolute(jTable.getSelectedRow() + 1);
-                        resultSet.deleteRow();
-                        wypisz();
-                        //dTableModel.removeRow(table.getSelectedRow());
-                    } catch (SQLException e1) {
-                        e1.printStackTrace();
+                    //usuwanie odbywa sie tylko w przypadku potwierdzenia
+                    int response = JOptionPane.showConfirmDialog(null, "Czy napewno chcesz usunąć zaznaczony wiersz?", "Potwierdzenie usunięcia",
+                            JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                    if (response == JOptionPane.YES_OPTION) {
+                        try {
+                            resultSet.absolute(jTable.getSelectedRow() + 1);
+                            resultSet.deleteRow();
+                        } catch (SQLException e1) {
+                            wypisz = false;
+                            //nazwa wyjatku
+                            String nazwa = e1.getClass().getSimpleName();
+                            //opis wyjatku
+                            String opis = e1.getMessage();
+                            JOptionPane.showMessageDialog(null, "ERROR: Nie można dokonać operacji usunięcia \n" +
+                                    "\n" + nazwa + "\n" + opis, "", JOptionPane.ERROR_MESSAGE);
+                        }
+                        if (wypisz) {
+                            //wypisuje uaktualniona tabele
+                            editable = true;
+                            str = "";
+                            str = text.getText();
+                            //jezeli nic nie jest wpisane wtedy pobieramy nazwe z okienka wyboru
+                            if (str.equals("")) {
+                                str = (String) tabele.getSelectedItem();
+                            }
+                            try {
+                                resultSet = statement.executeQuery("select * from " + str + " order by 1");
+                                wypisz();
+                                //   resultSet = statement.executeQuery("select m.nazwa, model,silnik,nowy,kolor,w.nazwa,n.nazwa,rok_produkcji as \"rok\",cena,t.nazwa,skrzynia_biegow from samochody left outer join modele using(id_model) left outer join marki m using(id_marka) left outer join wyposazenie w using(id_wyposazenie) left outer join rodzaj_napedu n using(id_naped) left outer join typ t using(id_typ);");
+                            } catch (SQLException ex) {
+                                JOptionPane.showMessageDialog(null, "ERROR: Nie istnieje tabela o podanej nazwie: " + str, "", JOptionPane.ERROR_MESSAGE);
+                                //    ex.printStackTrace();
+                            }
+                        }
                     }
-
-                    editable=true;
-                    str="";
-                    str=text.getText();
-                    //jezeli nic nie jest wpisane wtedy pobieramy nazwe z okienka wyboru
-                    if(str.equals("")){str=(String) tabele.getSelectedItem();}
-                    try {
-                        resultSet=statement.executeQuery("select * from "+str+" order by 1");
-                        wypisz();
-                        //   resultSet = statement.executeQuery("select m.nazwa, model,silnik,nowy,kolor,w.nazwa,n.nazwa,rok_produkcji as \"rok\",cena,t.nazwa,skrzynia_biegow from samochody left outer join modele using(id_model) left outer join marki m using(id_marka) left outer join wyposazenie w using(id_wyposazenie) left outer join rodzaj_napedu n using(id_naped) left outer join typ t using(id_typ);");
-                    } catch (SQLException ex) {
-                        JOptionPane.showMessageDialog(null, "ERROR: Nie istnieje tabela o podanej nazwie: "+str,"",JOptionPane.ERROR_MESSAGE);
-                        //    ex.printStackTrace();
-                    }
-
                 }
             }
         });
