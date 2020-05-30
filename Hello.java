@@ -83,6 +83,7 @@ public class Hello extends JFrame {
 
         tableModel.addTableModelListener(new TableModelListener() {
             public void tableChanged(TableModelEvent e) {
+                boolean godzina=false;
                 System.out.println(tableModel.getValueAt(e.getFirstRow(),e.getColumn()));
                 try{
                     //e.getRow i podobne numeruja od zera, ale pozostali numeruja od 1
@@ -107,17 +108,50 @@ public class Hello extends JFrame {
                         resultSet.updateString(e.getColumn()+1,(String) tableModel.getValueAt(e.getFirstRow(),e.getColumn()));
                         resultSet.updateRow();
                     }
-                    else{if(typ==92){
-                        //String zamiana=(String) tableModel.getValueAt(e.getFirstRow(),e.getColumn());
-                        DateFormat formatter = new SimpleDateFormat("HH:mm:ss");
-                        java.sql.Time zamiana= new java.sql.Time(formatter.parse((String) tableModel.getValueAt(e.getFirstRow(),e.getColumn())).getTime());
-                        resultSet.updateTime(e.getColumn()+1,zamiana);
-                        resultSet.updateRow();
+                    else {
+                        if (typ == 92) {
+                            godzina=true;
+                            //String zamiana=(String) tableModel.getValueAt(e.getFirstRow(),e.getColumn());
+                            DateFormat formatter = new SimpleDateFormat("HH:mm:ss");
+                            java.sql.Time zamiana = new java.sql.Time(formatter.parse((String) tableModel.getValueAt(e.getFirstRow(), e.getColumn())).getTime());
+                            resultSet.updateTime(e.getColumn() + 1, zamiana);
+                            resultSet.updateRow();
+                        }
+                        //zaden z powyzszych typow
+                        else {
+                        }
                     }
                     }
                     }
+                }catch(SQLException ex){
+                    if(!godzina) {
+                        String nazwa = ex.getClass().getSimpleName();
+                        //opis wyjatku
+                        String opis = ex.getMessage();
+                        JOptionPane.showMessageDialog(null, "ERROR: Nie można dokonać operacji uaktualnienia \n" +
+                                "\n" + nazwa + "\n" + opis, "", JOptionPane.ERROR_MESSAGE);
+                        //ponowne wypisanie starergo stanu
+                        editable = true;
+                        str = "";
+                        str = text.getText();
+                        //jezeli nic nie jest wpisane wtedy pobieramy nazwe z okienka wyboru
+                        if (str.equals("")) {
+                            str = (String) tabele.getSelectedItem();
+                        }
+                        try {
+                            resultSet = statement.executeQuery("select * from " + str + " order by 1");
+                            wypisz();
+                        } catch (SQLException exc) {
+                            exc.printStackTrace();
+                        }
                     }
-                }catch(SQLException ex){ex.printStackTrace();}
+                    //jezeli odkomentuje sie, to program sie zapetla
+                    //tak jak jest obeznie mozna dodac tylko jedna godzine ale zmiany nie zostana zapisane
+                    //jezeli doda sie godzine otwarcia i zamkniecia to zmiany zostana zapisane
+                    else{
+                       // JOptionPane.showMessageDialog(null, "Aby dodać godzinę otwarcia (zamknięcia) dodaj także godzinę zamknięcia (otwarcia)", "", JOptionPane.WARNING_MESSAGE);
+                    }
+                }
                 catch(NumberFormatException exc){exc.printStackTrace();}
                 catch(ParseException exce){exce.printStackTrace();}
             }
@@ -261,12 +295,12 @@ public class Hello extends JFrame {
                         try {
                             resultSet.absolute(jTable.getSelectedRow() + 1);
                             resultSet.deleteRow();
-                        } catch (SQLException e1) {
+                        } catch (SQLException ex) {
                             wypisz = false;
                             //nazwa wyjatku
-                            String nazwa = e1.getClass().getSimpleName();
+                            String nazwa = ex.getClass().getSimpleName();
                             //opis wyjatku
-                            String opis = e1.getMessage();
+                            String opis = ex.getMessage();
                             JOptionPane.showMessageDialog(null, "ERROR: Nie można dokonać operacji usunięcia \n" +
                                     "\n" + nazwa + "\n" + opis, "", JOptionPane.ERROR_MESSAGE);
                         }
@@ -324,6 +358,7 @@ public class Hello extends JFrame {
             }
         });
 
+        //w momencie zamkniecia aplikacji polaczenia z baza sa zamykane
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent we) {
                 try {
