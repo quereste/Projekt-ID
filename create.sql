@@ -401,7 +401,7 @@ CREATE TABLE historia_transakcji
 --jedna adres email moze zostac tylko raz podany
 CREATE OR REPLACE FUNCTION email_uni() RETURNS trigger AS $email_uni$
 BEGIN
-    IF New.email is distinct from null THEN
+    IF New.email<>Old.email THEN
         IF (Select count(*) from klienci_salonu where email=NEW.email)>0 then
             RAISE exception 'Tego adresu email uzywa juz ktos inny';
         END IF;
@@ -415,10 +415,24 @@ BEGIN
 END;
 $email_uni$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION email_ins() RETURNS trigger AS $email_ins$
+BEGIN
+        IF (Select count(*) from klienci_salonu where email=NEW.email)>0 then
+            RAISE exception 'Tego adresu email uzywa juz ktos inny';
+        END IF;
+
+        IF (Select count(*) from doradcy where email=NEW.email)>0 then
+            RAISE exception 'Tego adresu email uzywa juz ktos inny';
+        END IF;
+
+  RETURN NEW;
+END;
+$email_ins$ LANGUAGE plpgsql;
+
 --jeden numer telefonu moze zostac tylko raz podany
 CREATE OR REPLACE FUNCTION telefon_uni() RETURNS trigger AS $telefon_uni$
 BEGIN
-    IF New.telefon is distinct from null THEN
+    IF New.telefon<>Old.telefon THEN
 
         IF (Select count(*) from klienci_salonu where telefon=NEW.telefon)>0 then
             RAISE exception 'Tego numeru telefonu uzywa juz ktos inny';
@@ -442,8 +456,31 @@ BEGIN
 END;
 $telefon_uni$ LANGUAGE plpgsql;
 
-CREATE TRIGGER telefon_uni BEFORE INSERT OR UPDATE ON kierownicy
+CREATE OR REPLACE FUNCTION telefon_ins() RETURNS trigger AS $telefon_ins$
+BEGIN
+        IF (Select count(*) from klienci_salonu where telefon=NEW.telefon)>0 then
+            RAISE exception 'Tego numeru telefonu uzywa juz ktos inny';
+        END IF;
+
+        IF (Select count(*) from doradcy where telefon=NEW.telefon)>0 then
+            RAISE exception 'Tego numeru telefonu uzywa juz ktos inny';
+        END IF;
+
+        IF (Select count(*) from salon where telefon=NEW.telefon)>0 then
+            RAISE exception 'Tego numeru telefonu uzywa juz ktos inny';
+        END IF;
+
+        IF (Select count(*) from kierownicy where telefon=NEW.telefon)>0 then
+            RAISE exception 'Tego numeru telefonu uzywa juz ktos inny';
+        END IF;
+  RETURN NEW;
+END;
+$telefon_ins$ LANGUAGE plpgsql;
+
+CREATE TRIGGER telefon_uni BEFORE UPDATE ON kierownicy
 FOR EACH ROW EXECUTE PROCEDURE telefon_uni();
+CREATE TRIGGER telefon_ins BEFORE INSERT ON kierownicy
+FOR EACH ROW EXECUTE PROCEDURE telefon_ins();
 
 insert into kierownicy(id_kierownika, imie, nazwisko, telefon) values
 (10, 'Marcel', 'Buda', '293819292'),
@@ -454,8 +491,10 @@ insert into kierownicy(id_kierownika, imie, nazwisko, telefon) values
 (15, 'Kamil', 'Berko', '839290291')
 ;
 
-CREATE TRIGGER telefon_uni BEFORE INSERT OR UPDATE ON salon
+CREATE TRIGGER telefon_uni BEFORE UPDATE ON salon
 FOR EACH ROW EXECUTE PROCEDURE telefon_uni();
+CREATE TRIGGER telefon_ins BEFORE INSERT ON salon
+FOR EACH ROW EXECUTE PROCEDURE telefon_ins();
 
 insert into salon (id_salon, miasto, kod_pocztowy, adres, telefon, id_kierownika, tylko_nowe,
 		otwarcie_pon, zamkniecie_pon,
@@ -478,11 +517,15 @@ insert into salon (id_salon, miasto, kod_pocztowy, adres, telefon, id_kierownika
 	'08:00:00', '18:30:00','07:30:00', '17:45:00','08:00:00', '09:30:00', '09:00:00', '13:30:00')
 ;
 
-CREATE TRIGGER email_uni BEFORE INSERT OR UPDATE ON doradcy
+CREATE TRIGGER email_uni BEFORE UPDATE ON doradcy
 FOR EACH ROW EXECUTE PROCEDURE email_uni();
+CREATE TRIGGER email_ins BEFORE INSERT ON doradcy
+FOR EACH ROW EXECUTE PROCEDURE email_ins();
 
-CREATE TRIGGER telefon_uni BEFORE INSERT OR UPDATE ON doradcy
+CREATE TRIGGER telefon_uni BEFORE UPDATE ON doradcy
 FOR EACH ROW EXECUTE PROCEDURE telefon_uni();
+CREATE TRIGGER telefon_ins BEFORE INSERT ON doradcy
+FOR EACH ROW EXECUTE PROCEDURE telefon_ins();
 
 insert into doradcy(id_doradcy, id_salon, imie, nazwisko, telefon, email) values
 (1, 1, 'Michal', 'Radowicz', '815921910', 'rad_dla_porad@salon.com'),
@@ -502,11 +545,15 @@ insert into doradcy(id_doradcy, id_salon, imie, nazwisko, telefon, email) values
 (15, 6, 'Mikolaj', 'Zasiecki', '273817388', 'mzasiek@salon.com')
 ;
 
-CREATE TRIGGER email_uni BEFORE INSERT OR UPDATE ON klienci_salonu
+CREATE TRIGGER email_uni BEFORE UPDATE ON klienci_salonu
 FOR EACH ROW EXECUTE PROCEDURE email_uni();
+CREATE TRIGGER email_ins BEFORE INSERT ON klienci_salonu
+FOR EACH ROW EXECUTE PROCEDURE email_ins();
 
-CREATE TRIGGER telefon_uni BEFORE INSERT OR UPDATE ON klienci_salonu
+CREATE TRIGGER telefon_uni BEFORE UPDATE ON klienci_salonu
 FOR EACH ROW EXECUTE PROCEDURE telefon_uni();
+CREATE TRIGGER telefon_ins BEFORE INSERT ON klienci_salonu
+FOR EACH ROW EXECUTE PROCEDURE telefon_ins();
 
 insert into klienci_salonu(id_klienta, id_doradcy, imie, nazwisko, telefon, email,newsletter) values
 (1, 3, 'Marek', 'Wozidlo', '859382712', NULL,'NIE'),
@@ -587,7 +634,7 @@ $KM_kW$ LANGUAGE plpgsql;
 CREATE TRIGGER KM_kW BEFORE INSERT OR UPDATE ON samochody
 FOR EACH ROW EXECUTE PROCEDURE KM_kW();
 
---uzywany samochod nie moze byc przypisany do salonu ktory ma tylko asmochody nowe
+--uzywany samochod nie moze byc przypisany do salonu ktory ma tylko samochody nowe
 CREATE OR REPLACE FUNCTION uzywany() RETURNS trigger AS $uzywany$
 BEGIN
     IF (New.nowy='NIE' AND (Select tylko_nowe from salon where id_salon=NEW.id_salon)='TAK') then
