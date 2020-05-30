@@ -6,7 +6,15 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import javax.swing.event.*;
 import java.sql.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import java.text.SimpleDateFormat;  
+import java.text.DateFormat;  
+import java.text.ParseException;
 
 @SuppressWarnings("serial")
 public class Hello extends JFrame {
@@ -17,7 +25,7 @@ public class Hello extends JFrame {
             connection= DriverManager.getConnection
                     // ("jdbc:postgresql://db.tcs.uj.edu.pl/z11...", "z11...", "haslo");
                             ("jdbc:postgresql://db.tcs.uj.edu.pl/z1165952", "z1165952", "xHJaKo9E9ddu");
-            statement = connection.createStatement();
+            statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_UPDATABLE);
         }
         catch(SQLException | ClassNotFoundException err){System.out.println("ERROR");}
     }
@@ -28,6 +36,7 @@ public class Hello extends JFrame {
     private JLabel lab;
     static private JTextArea textArea;
     static private JTextField text;
+    static private JTextField text1;
     static Connection connection;
     static Statement statement;
     static ResultSet resultSet;
@@ -36,6 +45,7 @@ public class Hello extends JFrame {
     JScrollPane scroll;
     JTable jTable;
     JComboBox<String> tabele;
+	String str;
 
     /**
      * @param args
@@ -63,6 +73,49 @@ public class Hello extends JFrame {
     void wypisz() throws SQLException {
         tableModel=createResultTable(resultSet);
         jTable=new JTable(tableModel);
+		
+		tableModel.addTableModelListener(new TableModelListener() {
+            public void tableChanged(TableModelEvent e) {
+				System.out.println(tableModel.getValueAt(e.getFirstRow(),e.getColumn()));
+				try{
+					//e.getRow i podobne numeruja od zera, ale pozostali numeruja od 1
+					resultSet.absolute(e.getFirstRow()+1);
+					ResultSetMetaData meta= resultSet.getMetaData();
+					int typ=meta.getColumnType(e.getColumn()+1);
+					//integer||numeric
+					if(typ==4){
+						int zamiana=Integer.parseInt((String) tableModel.getValueAt(e.getFirstRow(),e.getColumn()));
+						resultSet.updateInt(e.getColumn()+1,zamiana);
+						resultSet.updateRow();					
+					}
+					//numeric, czyli moga wystapic po kropce cyfry
+					else{if(typ==2){
+						float zamiana=Float.parseFloat((String) tableModel.getValueAt(e.getFirstRow(),e.getColumn()));
+						resultSet.updateFloat(e.getColumn()+1,zamiana);
+						resultSet.updateRow();
+						}
+					//varchar||char
+					else{if(typ==12||typ==1){
+					//	String zamiana=(String) tableModel.getValueAt(e.getFirstRow(),e.getColumn());
+						resultSet.updateString(e.getColumn()+1,(String) tableModel.getValueAt(e.getFirstRow(),e.getColumn()));
+						resultSet.updateRow();
+						}
+					else{if(typ==92){
+							//String zamiana=(String) tableModel.getValueAt(e.getFirstRow(),e.getColumn());
+							DateFormat formatter = new SimpleDateFormat("HH:mm:ss");
+							java.sql.Time zamiana= new java.sql.Time(formatter.parse((String) tableModel.getValueAt(e.getFirstRow(),e.getColumn())).getTime());
+							resultSet.updateTime(e.getColumn()+1,zamiana);
+							resultSet.updateRow();
+							}		
+						}
+					}	
+					}
+				}catch(SQLException ex){ex.printStackTrace();}
+				catch(NumberFormatException exc){exc.printStackTrace();}
+				catch(ParseException exce){exce.printStackTrace();}
+		   }
+        });
+		
         scroll.setViewportView(jTable);
     }
 
@@ -81,12 +134,12 @@ public class Hello extends JFrame {
         buttonTwo = new JButton("Wyœwietl tabelê");
         //wykonuje zapytanie, a nastepnie je wyswietla
         buttonTwo.addActionListener(e -> {
-                    String str="";
+                    str="";
                     str=text.getText();
                     //jezeli nic nie jest wpisane wtedy pobieramy nazwe z okienka wyboru
                     if(str.equals("")){str=(String) tabele.getSelectedItem();}
                     try {
-                        resultSet=statement.executeQuery("select * from "+str);
+                        resultSet=statement.executeQuery("select * from "+str+" order by 1");
                         wypisz();
                      //   resultSet = statement.executeQuery("select m.nazwa, model,silnik,nowy,kolor,w.nazwa,n.nazwa,rok_produkcji as \"rok\",cena,t.nazwa,skrzynia_biegow from samochody left outer join modele using(id_model) left outer join marki m using(id_marka) left outer join wyposazenie w using(id_wyposazenie) left outer join rodzaj_napedu n using(id_naped) left outer join typ t using(id_typ);");
                     } catch (SQLException ex) {
@@ -113,13 +166,13 @@ public class Hello extends JFrame {
         JButton button4 = new JButton("Dostêpne samochody");
         //wykonuje zapytanie, a nastepnie je wyswietla
         button4.addActionListener(e -> {
-                    try {
-                        resultSet = statement.executeQuery("select m.nazwa, model,silnik,nowy,kolor,w.nazwa,n.nazwa,rok_produkcji as \"rok\",cena,t.nazwa,skrzynia_biegow from samochody left outer join modele using(id_model) left outer join marki m using(id_marka) left outer join wyposazenie w using(id_wyposazenie) left outer join rodzaj_napedu n using(id_naped) left outer join typ t using(id_typ);");
-                        wypisz();
-                    } catch (SQLException ex) {
-                        ex.printStackTrace();
-                    }
+                try {
+                    resultSet = statement.executeQuery("select m.nazwa, model,silnik,nowy,kolor,w.nazwa,n.nazwa,rok_produkcji as \"rok\",cena,t.nazwa,skrzynia_biegow from samochody left outer join modele using(id_model) left outer join marki m using(id_marka) left outer join wyposazenie w using(id_wyposazenie) left outer join rodzaj_napedu n using(id_naped) left outer join typ t using(id_typ);");
+                    wypisz();
+                } catch (SQLException ex){ 
+					ex.printStackTrace();
                 }
+            }
         );
 
         textArea = new JTextArea(30,40);
@@ -133,25 +186,70 @@ public class Hello extends JFrame {
       //  text.setBounds(140, 70, 200,30);
         text.setVisible(true);
 
+		JLabel lab3= new JLabel("Wpisz polecenie: ");
+
+		text1=new JTextField();
+        //ustawia wymiar tego pola
+        text1.setPreferredSize(new Dimension(this.getWidth()-50,30));
+      //  text.setBounds(140, 70, 200,30);
+        text1.setVisible(true);
+		
+		
+		//usuwanie wyswietla blad bo wykonuje sie ale nie zwraca wynikow
+		JButton button5 = new JButton("Wykonaj");
+        //wykonuje zapytanie, a nastepnie wyswietla wynik
+        button5.addActionListener(e -> {
+				str=text1.getText();
+                try {
+                    resultSet = statement.executeQuery(str);
+                    wypisz();
+                } catch (SQLException ex){
+					JOptionPane.showMessageDialog(null, "ERROR: B³êdne polecenie: "+str,"",JOptionPane.ERROR_MESSAGE);
+					ex.printStackTrace();
+                }
+            }
+        );
+		
         jTable=new JTable(new DefaultTableModel());
+		
         scroll=new JScrollPane(jTable,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        scroll.setSize(new Dimension(this.getWidth()-20,10));
-        scroll.setPreferredSize(new Dimension(this.getWidth()-20, scroll.getPreferredSize().height));
+        scroll.setSize(new Dimension(this.getWidth()-20,this.getHeight()-300));
+        scroll.setPreferredSize(new Dimension(this.getWidth()-20, this.getHeight()-300));
         scroll.setVisible(true);
 
         String[] tabeleTab = {"doradcy","klienci_salonu", "kierownicy","salon","historia_transakcji","samochody", "modele",
                 "marki","wyposazenie","modele_kraje","kraje","modele_wyposazenie","modele_naped","rodzaj_napedu","modele_typ","typ"};
         tabele = new JComboBox<>(tabeleTab);
 
+		tabele.addActionListener (new ActionListener () {
+			public void actionPerformed(ActionEvent e) {
+                    //jezeli nic nie jest wpisane wtedy pobieramy nazwe z okienka wyboru
+                    str=(String) tabele.getSelectedItem();
+                    try {
+                        resultSet=statement.executeQuery("select * from "+str+" order by 1");
+                        wypisz();
+                     //   resultSet = statement.executeQuery("select m.nazwa, model,silnik,nowy,kolor,w.nazwa,n.nazwa,rok_produkcji as \"rok\",cena,t.nazwa,skrzynia_biegow from samochody left outer join modele using(id_model) left outer join marki m using(id_marka) left outer join wyposazenie w using(id_wyposazenie) left outer join rodzaj_napedu n using(id_naped) left outer join typ t using(id_typ);");
+                    } catch (SQLException ex) {
+                    //    JOptionPane.showMessageDialog(null, "ERROR: Nie istnieje tabela o podanej nazwie: "+str,"",JOptionPane.ERROR_MESSAGE);
+                        ex.printStackTrace();
+                    }
+			}
+		});
+
     //    add(buttonOne);
      //   add(buttonTwo);
         add(buttonTrzy);
-
+		//wybieranie i wypisywanie tabel
         add(lab);
         add(text);
         add(tabele);
         add(buttonTwo);
         add(scroll);
+		//dowolne zapytanie
+		add(lab3);
+		add(text1);
+		add(button5);
+		//ciekawe zapytania
         add(lab2);
         add(button4);
         setVisible(true);
@@ -159,8 +257,8 @@ public class Hello extends JFrame {
         //jak okno zmienia rozmiar to takze tebela zmienia rozmiar
         addComponentListener(new ComponentAdapter() {
             public void componentResized(ComponentEvent componentEvent) {
-                scroll.setSize(new Dimension(getWidth()-20, 10));
-                scroll.setPreferredSize(new Dimension(getWidth()-20, scroll.getPreferredSize().height));
+                scroll.setSize(new Dimension(getWidth()-20, getHeight()-300));
+                scroll.setPreferredSize(new Dimension(getWidth()-20, getHeight()-300));
                 //odswieza widok (zmiania szeroksc tabeli)
                 revalidate();
             }
