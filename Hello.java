@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import java.awt.*;
@@ -12,8 +13,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-import java.text.SimpleDateFormat;  
-import java.text.DateFormat;  
+import java.text.SimpleDateFormat;
+import java.text.DateFormat;
 import java.text.ParseException;
 
 @SuppressWarnings("serial")
@@ -45,7 +46,8 @@ public class Hello extends JFrame {
     JScrollPane scroll;
     JTable jTable;
     JComboBox<String> tabele;
-	String str;
+    String str;
+    boolean editable;
 
     /**
      * @param args
@@ -72,56 +74,62 @@ public class Hello extends JFrame {
     //wyswietla tabele
     void wypisz() throws SQLException {
         tableModel=createResultTable(resultSet);
-        jTable=new JTable(tableModel);
-		
-		tableModel.addTableModelListener(new TableModelListener() {
+
+        if(editable){jTable=new JTable(tableModel);}
+        else{
+            jTable=new JTable(tableModel);
+            jTable.setEnabled(false);
+        }
+
+        tableModel.addTableModelListener(new TableModelListener() {
             public void tableChanged(TableModelEvent e) {
-				System.out.println(tableModel.getValueAt(e.getFirstRow(),e.getColumn()));
-				try{
-					//e.getRow i podobne numeruja od zera, ale pozostali numeruja od 1
-					resultSet.absolute(e.getFirstRow()+1);
-					ResultSetMetaData meta= resultSet.getMetaData();
-					int typ=meta.getColumnType(e.getColumn()+1);
-					//integer||numeric
-					if(typ==4){
-						int zamiana=Integer.parseInt((String) tableModel.getValueAt(e.getFirstRow(),e.getColumn()));
-						resultSet.updateInt(e.getColumn()+1,zamiana);
-						resultSet.updateRow();					
-					}
-					//numeric, czyli moga wystapic po kropce cyfry
-					else{if(typ==2){
-						float zamiana=Float.parseFloat((String) tableModel.getValueAt(e.getFirstRow(),e.getColumn()));
-						resultSet.updateFloat(e.getColumn()+1,zamiana);
-						resultSet.updateRow();
-						}
-					//varchar||char
-					else{if(typ==12||typ==1){
-					//	String zamiana=(String) tableModel.getValueAt(e.getFirstRow(),e.getColumn());
-						resultSet.updateString(e.getColumn()+1,(String) tableModel.getValueAt(e.getFirstRow(),e.getColumn()));
-						resultSet.updateRow();
-						}
-					else{if(typ==92){
-							//String zamiana=(String) tableModel.getValueAt(e.getFirstRow(),e.getColumn());
-							DateFormat formatter = new SimpleDateFormat("HH:mm:ss");
-							java.sql.Time zamiana= new java.sql.Time(formatter.parse((String) tableModel.getValueAt(e.getFirstRow(),e.getColumn())).getTime());
-							resultSet.updateTime(e.getColumn()+1,zamiana);
-							resultSet.updateRow();
-							}		
-						}
-					}	
-					}
-				}catch(SQLException ex){ex.printStackTrace();}
-				catch(NumberFormatException exc){exc.printStackTrace();}
-				catch(ParseException exce){exce.printStackTrace();}
-		   }
+                System.out.println(tableModel.getValueAt(e.getFirstRow(),e.getColumn()));
+                try{
+                    //e.getRow i podobne numeruja od zera, ale pozostali numeruja od 1
+                    resultSet.absolute(e.getFirstRow()+1);
+                    ResultSetMetaData meta= resultSet.getMetaData();
+                    int typ=meta.getColumnType(e.getColumn()+1);
+                    //integer||numeric
+                    if(typ==4){
+                        int zamiana=Integer.parseInt((String) tableModel.getValueAt(e.getFirstRow(),e.getColumn()));
+                        resultSet.updateInt(e.getColumn()+1,zamiana);
+                        resultSet.updateRow();
+                    }
+                    //numeric, czyli moga wystapic po kropce cyfry
+                    else{if(typ==2){
+                        float zamiana=Float.parseFloat((String) tableModel.getValueAt(e.getFirstRow(),e.getColumn()));
+                        resultSet.updateFloat(e.getColumn()+1,zamiana);
+                        resultSet.updateRow();
+                    }
+                    //varchar||char
+                    else{if(typ==12||typ==1){
+                        //	String zamiana=(String) tableModel.getValueAt(e.getFirstRow(),e.getColumn());
+                        resultSet.updateString(e.getColumn()+1,(String) tableModel.getValueAt(e.getFirstRow(),e.getColumn()));
+                        resultSet.updateRow();
+                    }
+                    else{if(typ==92){
+                        //String zamiana=(String) tableModel.getValueAt(e.getFirstRow(),e.getColumn());
+                        DateFormat formatter = new SimpleDateFormat("HH:mm:ss");
+                        java.sql.Time zamiana= new java.sql.Time(formatter.parse((String) tableModel.getValueAt(e.getFirstRow(),e.getColumn())).getTime());
+                        resultSet.updateTime(e.getColumn()+1,zamiana);
+                        resultSet.updateRow();
+                    }
+                    }
+                    }
+                    }
+                }catch(SQLException ex){ex.printStackTrace();}
+                catch(NumberFormatException exc){exc.printStackTrace();}
+                catch(ParseException exce){exce.printStackTrace();}
+            }
         });
-		
+
         scroll.setViewportView(jTable);
     }
 
     private void createAndShowGUI() {
-      //  setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    //    setDefaultCloseOperation(0);
+
+        //  setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        //    setDefaultCloseOperation(0);
         //rozmiar pierwszego okna
         setSize(600, 600);
         setResizable(true);
@@ -131,9 +139,10 @@ public class Hello extends JFrame {
 
         buttonOne = new JButton("Wypisz");
         buttonOne.addActionListener(e -> {System.out.println(text.getText());});
-        buttonTwo = new JButton("Wyœwietl tabelê");
+        buttonTwo = new JButton("WyÅ“wietl tabelÃª");
         //wykonuje zapytanie, a nastepnie je wyswietla
         buttonTwo.addActionListener(e -> {
+                    editable=true;
                     str="";
                     str=text.getText();
                     //jezeli nic nie jest wpisane wtedy pobieramy nazwe z okienka wyboru
@@ -141,16 +150,16 @@ public class Hello extends JFrame {
                     try {
                         resultSet=statement.executeQuery("select * from "+str+" order by 1");
                         wypisz();
-                     //   resultSet = statement.executeQuery("select m.nazwa, model,silnik,nowy,kolor,w.nazwa,n.nazwa,rok_produkcji as \"rok\",cena,t.nazwa,skrzynia_biegow from samochody left outer join modele using(id_model) left outer join marki m using(id_marka) left outer join wyposazenie w using(id_wyposazenie) left outer join rodzaj_napedu n using(id_naped) left outer join typ t using(id_typ);");
+                        //   resultSet = statement.executeQuery("select m.nazwa, model,silnik,nowy,kolor,w.nazwa,n.nazwa,rok_produkcji as \"rok\",cena,t.nazwa,skrzynia_biegow from samochody left outer join modele using(id_model) left outer join marki m using(id_marka) left outer join wyposazenie w using(id_wyposazenie) left outer join rodzaj_napedu n using(id_naped) left outer join typ t using(id_typ);");
                     } catch (SQLException ex) {
                         JOptionPane.showMessageDialog(null, "ERROR: Nie istnieje tabela o podanej nazwie: "+str,"",JOptionPane.ERROR_MESSAGE);
-                    //    ex.printStackTrace();
+                        //    ex.printStackTrace();
                     }
                 }
         );
 
         //zamyka polaczenie z baza i konczy program
-        buttonTrzy=new JButton("Zakoñcz");
+        buttonTrzy=new JButton("ZakoÃ±cz");
         buttonTrzy.addActionListener(e -> {
             try {
                 connection.close();
@@ -161,18 +170,19 @@ public class Hello extends JFrame {
             System.exit(0);
         });
 
-        lab = new JLabel("Wpisz albo wybierz nazwê tabeli któr¹ chcesz zobaczyæ: ");
-        JLabel lab2=new JLabel("Na skróty: ");
-        JButton button4 = new JButton("Dostêpne samochody");
+        lab = new JLabel("Wpisz albo wybierz nazwÃª tabeli ktÃ³rÂ¹ chcesz zobaczyÃ¦: ");
+        JLabel lab2=new JLabel("Na skrÃ³ty: ");
+        JButton button4 = new JButton("DostÃªpne samochody");
         //wykonuje zapytanie, a nastepnie je wyswietla
         button4.addActionListener(e -> {
-                try {
-                    resultSet = statement.executeQuery("select m.nazwa, model,silnik,nowy,kolor,w.nazwa,n.nazwa,rok_produkcji as \"rok\",cena,t.nazwa,skrzynia_biegow from samochody left outer join modele using(id_model) left outer join marki m using(id_marka) left outer join wyposazenie w using(id_wyposazenie) left outer join rodzaj_napedu n using(id_naped) left outer join typ t using(id_typ);");
-                    wypisz();
-                } catch (SQLException ex){ 
-					ex.printStackTrace();
+                    editable=false;
+                    try {
+                        resultSet = statement.executeQuery("select m.nazwa, model,silnik,nowy,kolor,w.nazwa,n.nazwa,rok_produkcji as \"rok\",cena,t.nazwa,skrzynia_biegow from samochody left outer join modele using(id_model) left outer join marki m using(id_marka) left outer join wyposazenie w using(id_wyposazenie) left outer join rodzaj_napedu n using(id_naped) left outer join typ t using(id_typ);");
+                        wypisz();
+                    } catch (SQLException ex){
+                        ex.printStackTrace();
+                    }
                 }
-            }
         );
 
         textArea = new JTextArea(30,40);
@@ -183,35 +193,36 @@ public class Hello extends JFrame {
         text=new JTextField();
         //ustawia wymiar tego pola
         text.setPreferredSize(new Dimension(300,30));
-      //  text.setBounds(140, 70, 200,30);
+        //  text.setBounds(140, 70, 200,30);
         text.setVisible(true);
 
-		JLabel lab3= new JLabel("Wpisz polecenie: ");
+        JLabel lab3= new JLabel("Wpisz polecenie: ");
 
-		text1=new JTextField();
+        text1=new JTextField();
         //ustawia wymiar tego pola
         text1.setPreferredSize(new Dimension(this.getWidth()-50,30));
-      //  text.setBounds(140, 70, 200,30);
+        //  text.setBounds(140, 70, 200,30);
         text1.setVisible(true);
-		
-		
-		//usuwanie wyswietla blad bo wykonuje sie ale nie zwraca wynikow
-		JButton button5 = new JButton("Wykonaj");
+
+
+        //usuwanie wyswietla blad bo wykonuje sie ale nie zwraca wynikow
+        JButton button5 = new JButton("Wykonaj");
         //wykonuje zapytanie, a nastepnie wyswietla wynik
         button5.addActionListener(e -> {
-				str=text1.getText();
-                try {
-                    resultSet = statement.executeQuery(str);
-                    wypisz();
-                } catch (SQLException ex){
-					JOptionPane.showMessageDialog(null, "ERROR: B³êdne polecenie: "+str,"",JOptionPane.ERROR_MESSAGE);
-					ex.printStackTrace();
+                    editable=false;
+                    str=text1.getText();
+                    try {
+                        resultSet = statement.executeQuery(str);
+                        wypisz();
+                    } catch (SQLException ex){
+                        JOptionPane.showMessageDialog(null, "ERROR: BÂ³Ãªdne polecenie: "+str,"",JOptionPane.ERROR_MESSAGE);
+                        ex.printStackTrace();
+                    }
                 }
-            }
         );
-		
+
         jTable=new JTable(new DefaultTableModel());
-		
+
         scroll=new JScrollPane(jTable,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         scroll.setSize(new Dimension(this.getWidth()-20,this.getHeight()-300));
         scroll.setPreferredSize(new Dimension(this.getWidth()-20, this.getHeight()-300));
@@ -221,35 +232,36 @@ public class Hello extends JFrame {
                 "marki","wyposazenie","modele_kraje","kraje","modele_wyposazenie","modele_naped","rodzaj_napedu","modele_typ","typ"};
         tabele = new JComboBox<>(tabeleTab);
 
-		tabele.addActionListener (new ActionListener () {
-			public void actionPerformed(ActionEvent e) {
-                    //jezeli nic nie jest wpisane wtedy pobieramy nazwe z okienka wyboru
-                    str=(String) tabele.getSelectedItem();
-                    try {
-                        resultSet=statement.executeQuery("select * from "+str+" order by 1");
-                        wypisz();
-                     //   resultSet = statement.executeQuery("select m.nazwa, model,silnik,nowy,kolor,w.nazwa,n.nazwa,rok_produkcji as \"rok\",cena,t.nazwa,skrzynia_biegow from samochody left outer join modele using(id_model) left outer join marki m using(id_marka) left outer join wyposazenie w using(id_wyposazenie) left outer join rodzaj_napedu n using(id_naped) left outer join typ t using(id_typ);");
-                    } catch (SQLException ex) {
+        tabele.addActionListener (new ActionListener () {
+            public void actionPerformed(ActionEvent e) {
+                editable=true;
+                //jezeli nic nie jest wpisane wtedy pobieramy nazwe z okienka wyboru
+                str=(String) tabele.getSelectedItem();
+                try {
+                    resultSet=statement.executeQuery("select * from "+str+" order by 1");
+                    wypisz();
+                    //   resultSet = statement.executeQuery("select m.nazwa, model,silnik,nowy,kolor,w.nazwa,n.nazwa,rok_produkcji as \"rok\",cena,t.nazwa,skrzynia_biegow from samochody left outer join modele using(id_model) left outer join marki m using(id_marka) left outer join wyposazenie w using(id_wyposazenie) left outer join rodzaj_napedu n using(id_naped) left outer join typ t using(id_typ);");
+                } catch (SQLException ex) {
                     //    JOptionPane.showMessageDialog(null, "ERROR: Nie istnieje tabela o podanej nazwie: "+str,"",JOptionPane.ERROR_MESSAGE);
-                        ex.printStackTrace();
-                    }
-			}
-		});
+                    ex.printStackTrace();
+                }
+            }
+        });
 
-    //    add(buttonOne);
-     //   add(buttonTwo);
+        //    add(buttonOne);
+        //   add(buttonTwo);
         add(buttonTrzy);
-		//wybieranie i wypisywanie tabel
+        //wybieranie i wypisywanie tabel
         add(lab);
         add(text);
         add(tabele);
         add(buttonTwo);
         add(scroll);
-		//dowolne zapytanie
-		add(lab3);
-		add(text1);
-		add(button5);
-		//ciekawe zapytania
+        //dowolne zapytanie
+        add(lab3);
+        add(text1);
+        add(button5);
+        //ciekawe zapytania
         add(lab2);
         add(button4);
         setVisible(true);
@@ -277,4 +289,3 @@ public class Hello extends JFrame {
         });
     }
 }
-
