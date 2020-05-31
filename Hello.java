@@ -68,16 +68,24 @@ public class Hello extends JFrame {
             for(int i=0;i< data.length;++i) { data[i]=row.getObject(i+1);}
             tableModel.addRow(data);
         }
+
+        //jesli tabele mozna update-towac, to mozna wykonac na niej takze insert
+        //dodaje nowy pusty wiersz, ktory bedzie sluzyl do insert
+        //trzeba jeszcze dodac odpowiednie zachowanie w momencie edycji tej komorki
+        if(editable) {
+            Object data[] = new Object[cols.length];
+            tableModel.addRow(data);
+        }
+
         return tableModel;
     }
 
     //wyswietla tabele
     void wypisz() throws SQLException {
         tableModel=createResultTable(resultSet);
-
-        if(editable){jTable=new JTable(tableModel);}
-        else{
-            jTable=new JTable(tableModel);
+        jTable=new JTable(tableModel);
+        //wylaczone zaznaczanie wierszy i zmienianie zawartosci komorek
+        if(!editable){
             jTable.setEnabled(false);
         }
 
@@ -85,75 +93,107 @@ public class Hello extends JFrame {
             public void tableChanged(TableModelEvent e) {
                 boolean godzina=false;
                 System.out.println(tableModel.getValueAt(e.getFirstRow(),e.getColumn()));
-                try{
-                    //e.getRow i podobne numeruja od zera, ale pozostali numeruja od 1
-                    resultSet.absolute(e.getFirstRow()+1);
-                    ResultSetMetaData meta= resultSet.getMetaData();
-                    int typ=meta.getColumnType(e.getColumn()+1);
-                    //integer||numeric
-                    if(typ==4){
-                        int zamiana=Integer.parseInt((String) tableModel.getValueAt(e.getFirstRow(),e.getColumn()));
-                        resultSet.updateInt(e.getColumn()+1,zamiana);
-                        resultSet.updateRow();
+                int liczbaWierszy=0;
+
+                try {
+                    if (resultSet.last()) {
+                        liczbaWierszy = resultSet.getRow();
                     }
-                    //numeric, czyli moga wystapic po kropce cyfry
-                    else{if(typ==2){
-                        float zamiana=Float.parseFloat((String) tableModel.getValueAt(e.getFirstRow(),e.getColumn()));
-                        resultSet.updateFloat(e.getColumn()+1,zamiana);
-                        resultSet.updateRow();
-                    }
-                    //varchar||char
-                    else{if(typ==12||typ==1){
-                        //	String zamiana=(String) tableModel.getValueAt(e.getFirstRow(),e.getColumn());
-                        resultSet.updateString(e.getColumn()+1,(String) tableModel.getValueAt(e.getFirstRow(),e.getColumn()));
-                        resultSet.updateRow();
-                    }
-                    else {
-                        if (typ == 92) {
-                            godzina=true;
-                            //String zamiana=(String) tableModel.getValueAt(e.getFirstRow(),e.getColumn());
-                            DateFormat formatter = new SimpleDateFormat("HH:mm:ss");
-                            java.sql.Time zamiana = new java.sql.Time(formatter.parse((String) tableModel.getValueAt(e.getFirstRow(), e.getColumn())).getTime());
-                            resultSet.updateTime(e.getColumn() + 1, zamiana);
+                }catch(SQLException ex){}
+
+                //edytowany jest istniejacy wpis
+                if(e.getFirstRow()<liczbaWierszy) {
+                    try {
+                        //e.getRow i podobne numeruja od zera, ale pozostali numeruja od 1
+                        resultSet.absolute(e.getFirstRow() + 1);
+                        ResultSetMetaData meta = resultSet.getMetaData();
+                        int typ = meta.getColumnType(e.getColumn() + 1);
+                        //integer||numeric
+                        if (typ == 4) {
+                            int zamiana = Integer.parseInt((String) tableModel.getValueAt(e.getFirstRow(), e.getColumn()));
+                            resultSet.updateInt(e.getColumn() + 1, zamiana);
                             resultSet.updateRow();
                         }
-                        //zaden z powyzszych typow
+                        //numeric, czyli moga wystapic po kropce cyfry
                         else {
+                            if (typ == 2) {
+                                float zamiana = Float.parseFloat((String) tableModel.getValueAt(e.getFirstRow(), e.getColumn()));
+                                resultSet.updateFloat(e.getColumn() + 1, zamiana);
+                                resultSet.updateRow();
+                            }
+                            //varchar||char
+                            else {
+                                if (typ == 12 || typ == 1) {
+                                    //	String zamiana=(String) tableModel.getValueAt(e.getFirstRow(),e.getColumn());
+                                    resultSet.updateString(e.getColumn() + 1, (String) tableModel.getValueAt(e.getFirstRow(), e.getColumn()));
+                                    resultSet.updateRow();
+                                } else {
+                                    if (typ == 92) {
+                                        godzina = true;
+                                        //String zamiana=(String) tableModel.getValueAt(e.getFirstRow(),e.getColumn());
+                                        DateFormat formatter = new SimpleDateFormat("HH:mm:ss");
+                                        java.sql.Time zamiana = new java.sql.Time(formatter.parse((String) tableModel.getValueAt(e.getFirstRow(), e.getColumn())).getTime());
+                                        resultSet.updateTime(e.getColumn() + 1, zamiana);
+                                        resultSet.updateRow();
+                                    }
+                                    //zaden z powyzszych typow
+                                    else {
+                                    }
+                                }
+                            }
                         }
-                    }
-                    }
-                    }
-                }catch(SQLException ex){
-                    if(!godzina) {
-                        String nazwa = ex.getClass().getSimpleName();
-                        //opis wyjatku
-                        String opis = ex.getMessage();
-                        JOptionPane.showMessageDialog(null, "ERROR: Nie można dokonać operacji uaktualnienia \n" +
-                                "\n" + nazwa + "\n" + opis, "", JOptionPane.ERROR_MESSAGE);
-                        //ponowne wypisanie starergo stanu
-                        editable = true;
-                        str = "";
-                        str = text.getText();
-                        //jezeli nic nie jest wpisane wtedy pobieramy nazwe z okienka wyboru
-                        if (str.equals("")) {
-                            str = (String) tabele.getSelectedItem();
+                    } catch (SQLException ex) {
+                        if (!godzina) {
+                            String nazwa = ex.getClass().getSimpleName();
+                            //opis wyjatku
+                            String opis = ex.getMessage();
+                            JOptionPane.showMessageDialog(null, "ERROR: Nie można dokonać operacji uaktualnienia \n" +
+                                    "\n" + nazwa + "\n" + opis, "", JOptionPane.ERROR_MESSAGE);
+                            //ponowne wypisanie starergo stanu
+                            editable = true;
+                            str = "";
+                            str = text.getText();
+                            //jezeli nic nie jest wpisane wtedy pobieramy nazwe z okienka wyboru
+                            if (str.equals("")) {
+                                str = (String) tabele.getSelectedItem();
+                            }
+                            try {
+                                resultSet = statement.executeQuery("select * from " + str + " order by 1");
+                                wypisz();
+                            } catch (SQLException exc) {
+                                exc.printStackTrace();
+                            }
                         }
-                        try {
-                            resultSet = statement.executeQuery("select * from " + str + " order by 1");
-                            wypisz();
-                        } catch (SQLException exc) {
-                            exc.printStackTrace();
+                        //jezeli odkomentuje sie, to program sie zapetla
+                        //tak jak jest obeznie mozna dodac tylko jedna godzine ale zmiany nie zostana zapisane
+                        //jezeli doda sie godzine otwarcia i zamkniecia to zmiany zostana zapisane
+                        else {
+                            // JOptionPane.showMessageDialog(null, "Aby dodać godzinę otwarcia (zamknięcia) dodaj także godzinę zamknięcia (otwarcia)", "", JOptionPane.WARNING_MESSAGE);
                         }
-                    }
-                    //jezeli odkomentuje sie, to program sie zapetla
-                    //tak jak jest obeznie mozna dodac tylko jedna godzine ale zmiany nie zostana zapisane
-                    //jezeli doda sie godzine otwarcia i zamkniecia to zmiany zostana zapisane
-                    else{
-                       // JOptionPane.showMessageDialog(null, "Aby dodać godzinę otwarcia (zamknięcia) dodaj także godzinę zamknięcia (otwarcia)", "", JOptionPane.WARNING_MESSAGE);
+                    } catch (ParseException exce) {
+                        exce.printStackTrace();
                     }
                 }
-                catch(NumberFormatException exc){exc.printStackTrace();}
-                catch(ParseException exce){exce.printStackTrace();}
+                //edytowany jest wiersz do insertu, nic nie robimy bo dodajemy po wcisnieciu dodaj
+                else{
+                    /*
+                    try {
+                        resultSet.moveToInsertRow(); // moves cursor to the insert row
+                        resultSet.updateString(3, "Napis");
+                        //nie zostaly jeszcze wpisane wszystkie wymagane pola, albo cos jest z danymi nie tak
+                    } catch (SQLException ex) {
+                     //   ex.printStackTrace();
+                    }
+                    try {
+                        resultSet.insertRow();
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                    }
+
+                    //   rs.moveToCurrentRow();
+
+                     */
+                }
             }
         });
 
@@ -327,6 +367,66 @@ public class Hello extends JFrame {
             }
         });
 
+        JButton buttonAdd = new JButton("Wstaw wiersz");
+        buttonAdd.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int liczbaWierszy=0;
+
+                try{
+                    if (resultSet.last()) {
+                        liczbaWierszy = resultSet.getRow();
+                    }
+                    //przesuwa wskaznik tesultset, aby wskazywal na specjalny wiersz do insertu
+                    resultSet.moveToInsertRow();
+                    ResultSetMetaData meta= resultSet.getMetaData();
+                    int szerokosc=meta.getColumnCount();
+                    int i=0;
+                    while(i<szerokosc) {
+                        i++;
+                        int typ = meta.getColumnType(i);
+                        //integer||numeric
+                        if (typ == 4) {
+                            //table model indeksuje od zera, result set od jeden
+                            int zamiana = Integer.parseInt((String) tableModel.getValueAt(liczbaWierszy,i-1));
+                            System.out.println(zamiana+ " nowa wartosc");
+                            resultSet.updateInt(i, zamiana);
+                        }
+                        //numeric, czyli moga wystapic po kropce cyfry
+                        else {
+                            if (typ == 2) {
+                                float zamiana = Float.parseFloat((String) tableModel.getValueAt(liczbaWierszy,i-1));
+                                System.out.println(zamiana+ " nowa wartosc");
+                                resultSet.updateFloat(i, zamiana);
+                            }
+                            //varchar||char
+                            else {
+                                if (typ == 12 || typ == 1) {
+                                    //	String zamiana=(String) tableModel.getValueAt(e.getFirstRow(),e.getColumn());
+                                    resultSet.updateString(i, (String) tableModel.getValueAt(liczbaWierszy,i-1));
+                                } else {
+                                    if (typ == 92) {
+                               //         godzina = true;
+                                        //String zamiana=(String) tableModel.getValueAt(e.getFirstRow(),e.getColumn());
+                                        DateFormat formatter = new SimpleDateFormat("HH:mm:ss");
+                                        java.sql.Time zamiana = new java.sql.Time(formatter.parse((String) tableModel.getValueAt(liczbaWierszy,i-1)).getTime());
+                                        resultSet.updateTime(i, zamiana);
+                                    }
+                                    //zaden z powyzszych typow
+                                    else {
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    resultSet.insertRow();
+                  //  resultSet.moveToCurrentRow();
+                }catch(SQLException | ParseException ex){
+                    ex.printStackTrace();
+                }
+
+            }
+        });
+
 
         //    add(buttonOne);
         //   add(buttonTwo);
@@ -339,6 +439,8 @@ public class Hello extends JFrame {
         add(scroll);
         //usuwanie
         add(buttonRemove);
+        //dodawanie
+        add(buttonAdd);
         //dowolne zapytanie
         add(lab3);
         add(text1);
