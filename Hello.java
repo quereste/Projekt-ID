@@ -1,13 +1,10 @@
 import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import javax.swing.event.*;
 import java.sql.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -31,9 +28,10 @@ public class Hello extends JFrame {
         catch(SQLException | ClassNotFoundException err){System.out.println("ERROR");}
     }
 
+    enum bool_enum {TAK,NIE}
     private JButton buttonOne;
     private JButton buttonTwo;
-    private JButton buttonTrzy;
+    private JButton buttonClose;
     private JLabel lab;
     static private JTextArea textArea;
     static private JTextField text;
@@ -129,15 +127,28 @@ public class Hello extends JFrame {
                                     resultSet.updateRow();
                                 } else {
                                     if (typ == 92) {
-                                        godzina = true;
-                                        //String zamiana=(String) tableModel.getValueAt(e.getFirstRow(),e.getColumn());
-                                        DateFormat formatter = new SimpleDateFormat("HH:mm:ss");
-                                        java.sql.Time zamiana = new java.sql.Time(formatter.parse((String) tableModel.getValueAt(e.getFirstRow(), e.getColumn())).getTime());
-                                        resultSet.updateTime(e.getColumn() + 1, zamiana);
+                                        godzina=true;
+                                        String zam=(String) tableModel.getValueAt(e.getFirstRow(), e.getColumn());
+                                        if(!zam.equals("")) {
+                                            DateFormat formatter = new SimpleDateFormat("HH:mm:ss");
+                                            java.sql.Time zamiana = new java.sql.Time(formatter.parse(zam).getTime());
+                                            resultSet.updateTime(e.getColumn() + 1, zamiana);
+                                        }
+                                        //update na null
+                                        else{
+                                            resultSet.updateNull(e.getColumn() + 1);
+                                        }
                                         resultSet.updateRow();
                                     }
                                     //zaden z powyzszych typow
-                                    else {
+                                    else{if(typ==91){
+                                        java.sql.Date zamiana =java.sql.Date.valueOf((String) tableModel.getValueAt(e.getFirstRow(), e.getColumn()));
+                                        resultSet.updateDate(e.getColumn() + 1, zamiana);
+                                        resultSet.updateRow();
+                                        }
+                                        else{
+                                        JOptionPane.showMessageDialog(null, "Błąd wewnętrzny bazy","", JOptionPane.ERROR_MESSAGE);
+                                    }
                                     }
                                 }
                             }
@@ -172,28 +183,16 @@ public class Hello extends JFrame {
                         }
                     } catch (ParseException exce) {
                         exce.printStackTrace();
+                    } catch(IllegalArgumentException excep){
+                        String nazwa = excep.getClass().getSimpleName();
+                        //opis wyjatku
+                        String opis = excep.getMessage();
+                        JOptionPane.showMessageDialog(null, "ERROR: Nie można dokonać operacji uaktualnienia \n" +
+                                "\n" +"Prawdopodobnie data podana jest w błędnym formacie \n"+"\n"+ nazwa + "\n" + opis, "", JOptionPane.ERROR_MESSAGE);
                     }
                 }
                 //edytowany jest wiersz do insertu, nic nie robimy bo dodajemy po wcisnieciu dodaj
-                else{
-                    /*
-                    try {
-                        resultSet.moveToInsertRow(); // moves cursor to the insert row
-                        resultSet.updateString(3, "Napis");
-                        //nie zostaly jeszcze wpisane wszystkie wymagane pola, albo cos jest z danymi nie tak
-                    } catch (SQLException ex) {
-                     //   ex.printStackTrace();
-                    }
-                    try {
-                        resultSet.insertRow();
-                    } catch (SQLException ex) {
-                        ex.printStackTrace();
-                    }
-
-                    //   rs.moveToCurrentRow();
-
-                     */
-                }
+                else{ }
             }
         });
 
@@ -233,8 +232,8 @@ public class Hello extends JFrame {
         );
 
         //zamyka polaczenie z baza i konczy program
-        buttonTrzy=new JButton("Zakoñcz");
-        buttonTrzy.addActionListener(e -> {
+        buttonClose =new JButton("Zakończ");
+        buttonClose.addActionListener(e -> {
             try {
                 connection.close();
                 statement.close();
@@ -371,6 +370,8 @@ public class Hello extends JFrame {
         buttonAdd.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 int liczbaWierszy=0;
+                int i=0;
+                ResultSetMetaData meta= null;
 
                 try{
                     if (resultSet.last()) {
@@ -378,24 +379,22 @@ public class Hello extends JFrame {
                     }
                     //przesuwa wskaznik tesultset, aby wskazywal na specjalny wiersz do insertu
                     resultSet.moveToInsertRow();
-                    ResultSetMetaData meta= resultSet.getMetaData();
+                    meta = resultSet.getMetaData();
                     int szerokosc=meta.getColumnCount();
-                    int i=0;
                     while(i<szerokosc) {
                         i++;
+                        System.out.println("numer kolumny: " +i);
                         int typ = meta.getColumnType(i);
                         //integer||numeric
                         if (typ == 4) {
                             //table model indeksuje od zera, result set od jeden
                             int zamiana = Integer.parseInt((String) tableModel.getValueAt(liczbaWierszy,i-1));
-                            System.out.println(zamiana+ " nowa wartosc");
                             resultSet.updateInt(i, zamiana);
                         }
                         //numeric, czyli moga wystapic po kropce cyfry
                         else {
                             if (typ == 2) {
                                 float zamiana = Float.parseFloat((String) tableModel.getValueAt(liczbaWierszy,i-1));
-                                System.out.println(zamiana+ " nowa wartosc");
                                 resultSet.updateFloat(i, zamiana);
                             }
                             //varchar||char
@@ -405,15 +404,23 @@ public class Hello extends JFrame {
                                     resultSet.updateString(i, (String) tableModel.getValueAt(liczbaWierszy,i-1));
                                 } else {
                                     if (typ == 92) {
-                               //         godzina = true;
-                                        //String zamiana=(String) tableModel.getValueAt(e.getFirstRow(),e.getColumn());
-                                        DateFormat formatter = new SimpleDateFormat("HH:mm:ss");
-                                        java.sql.Time zamiana = new java.sql.Time(formatter.parse((String) tableModel.getValueAt(liczbaWierszy,i-1)).getTime());
-                                        resultSet.updateTime(i, zamiana);
+                                        String zam=(String) tableModel.getValueAt(liczbaWierszy,i-1);
+                                        if(!zam.equals("")) {
+                                            DateFormat formatter = new SimpleDateFormat("HH:mm:ss");
+                                            java.sql.Time zamiana = new java.sql.Time(formatter.parse(zam).getTime());
+                                            resultSet.updateTime(i, zamiana);
+                                        }
                                     }
-                                    //zaden z powyzszych typow
                                     else {
-                                    }
+                                        if(typ==91){
+                                            java.sql.Date zamiana =java.sql.Date.valueOf((String) tableModel.getValueAt(liczbaWierszy,i-1));
+                                            resultSet.updateDate(i, zamiana);
+                                        }
+                                        //zaden z powyzszych typow
+                                        else {
+                                            JOptionPane.showMessageDialog(null, "Błąd wewnętrzny bazy","", JOptionPane.ERROR_MESSAGE);
+                                        }
+                                        }
                                 }
                             }
                         }
@@ -421,7 +428,33 @@ public class Hello extends JFrame {
                     resultSet.insertRow();
                   //  resultSet.moveToCurrentRow();
                 }catch(SQLException | ParseException ex){
-                    ex.printStackTrace();
+                    bool_enum zamiana=bool_enum.valueOf((String) tableModel.getValueAt(liczbaWierszy,i-1));
+                    try {
+                        resultSet.updateString(i, zamiana.name());
+                    } catch (SQLException exc) {
+                        exc.printStackTrace();
+                    }
+
+                    String nazwa = ex.getClass().getSimpleName();
+                    //opis wyjatku
+                    String opis = ex.getMessage();
+                    JOptionPane.showMessageDialog(null, "ERROR: Nie można dokonać operacji wstawienia \n" +
+                            "\n"+"Sprawdz czy wszystkie wymagane pola są wypełnione \n"+"\n" + nazwa + "\n" + opis, "", JOptionPane.ERROR_MESSAGE);
+                }catch (NumberFormatException exc){
+                    String nazwaCol="nieznana";
+                    try {
+                        if (meta != null) {
+                            nazwaCol=meta.getColumnLabel(i);
+                        }
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                    }
+
+                    String nazwa = exc.getClass().getSimpleName();
+                    //opis wyjatku
+                    String opis = exc.getMessage();
+                    JOptionPane.showMessageDialog(null, "ERROR: Nie można dokonać operacji wstawienia \n" +
+                            "\n"+"Sprawdz czy wartość w kolumnie "+nazwaCol+" jest odpowiedniego typu \n"+"\n" + nazwa + "\n" + opis, "", JOptionPane.ERROR_MESSAGE);
                 }
 
             }
@@ -430,7 +463,7 @@ public class Hello extends JFrame {
 
         //    add(buttonOne);
         //   add(buttonTwo);
-        add(buttonTrzy);
+        add(buttonClose);
         //wybieranie i wypisywanie tabel
         add(lab);
         add(text);
