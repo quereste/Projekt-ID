@@ -28,7 +28,6 @@ public class Hello extends JFrame {
         catch(SQLException | ClassNotFoundException err){System.out.println("ERROR");}
     }
 
-    enum bool_enum {TAK,NIE}
     private JButton buttonOne;
     private JButton buttonTwo;
     private JButton buttonClose;
@@ -223,7 +222,6 @@ public class Hello extends JFrame {
                     try {
                         resultSet=statement.executeQuery("select * from "+str+" order by 1");
                         wypisz();
-                        //   resultSet = statement.executeQuery("select m.nazwa, model,silnik,nowy,kolor,w.nazwa,n.nazwa,rok_produkcji as \"rok\",cena,t.nazwa,skrzynia_biegow from samochody left outer join modele using(id_model) left outer join marki m using(id_marka) left outer join wyposazenie w using(id_wyposazenie) left outer join rodzaj_napedu n using(id_naped) left outer join typ t using(id_typ);");
                     } catch (SQLException ex) {
                         JOptionPane.showMessageDialog(null, "ERROR: Nie istnieje tabela o podanej nazwie: "+str,"",JOptionPane.ERROR_MESSAGE);
                         //    ex.printStackTrace();
@@ -426,15 +424,18 @@ public class Hello extends JFrame {
                         }
                     }
                     resultSet.insertRow();
-                  //  resultSet.moveToCurrentRow();
-                }catch(SQLException | ParseException ex){
-                    bool_enum zamiana=bool_enum.valueOf((String) tableModel.getValueAt(liczbaWierszy,i-1));
+
+                    //wypisuje zaktualizowana tabele
+                    editable=true;
                     try {
-                        resultSet.updateString(i, zamiana.name());
-                    } catch (SQLException exc) {
-                        exc.printStackTrace();
+                        resultSet=statement.executeQuery("select * from "+str+" order by 1");
+                        wypisz();
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
                     }
 
+                  //  resultSet.moveToCurrentRow();
+                }catch(SQLException | ParseException ex){
                     String nazwa = ex.getClass().getSimpleName();
                     //opis wyjatku
                     String opis = ex.getMessage();
