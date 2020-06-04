@@ -339,7 +339,7 @@ CREATE TABLE klienci_salonu
 	nazwa varchar(100),
 	telefon varchar(25),
 	email varchar(50),
-	newsletter bool_enum NOT NULL,
+	newsletter char(3) NOT NULL,
 
 	CHECK (telefon IS NOT NULL OR email IS NOT NULL),
 	CHECK((imie IS NOT NULL AND nazwisko IS NOT NULL) OR nazwa IS NOT NULL),
