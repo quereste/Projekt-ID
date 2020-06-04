@@ -280,8 +280,6 @@ CREATE TABLE kierownicy(
 	telefon varchar (25) NOT NULL
 );
 
-CREATE TYPE bool_enum AS ENUM ('TAK','NIE');
-
 drop table if exists salon cascade;
 CREATE TABLE salon
 (
@@ -291,7 +289,7 @@ CREATE TABLE salon
 	adres varchar(50),
 	telefon varchar(25),
 	id_kierownika numeric(2) REFERENCES kierownicy NOT NULL,
-	tylko_nowe bool_enum NOT NULL, 
+	tylko_nowe char(3) NOT NULL, 
 	otwarcie_pon time,
 	zamkniecie_pon time,
 	otwarcie_wt time,
@@ -317,6 +315,7 @@ CREATE TABLE salon
 	OR (otwarcie_pt IS NOT NULL AND zamkniecie_pt IS NOT NULL AND otwarcie_pt < zamkniecie_pt)),
 	CHECK ((otwarcie_sb IS NULL AND zamkniecie_sb IS NULL) 
 	OR (otwarcie_sb IS NOT NULL AND zamkniecie_sb IS NOT NULL AND otwarcie_sb < zamkniecie_sb))
+	CHECK(tylko_nowe='TAK' OR tylko_nowe='NIE')
 );
 
 drop table if exists doradcy cascade;
@@ -347,9 +346,6 @@ CREATE TABLE klienci_salonu
 	CHECK((newsletter='TAK' AND email IS NOT NULL) OR newsletter='NIE')
 );
 
-CREATE TYPE skrzynia_enum AS ENUM ('automatyczna','manualna','CVT','polautomatyczna');
-CREATE TYPE silnik_enum AS ENUM ('benzyna','diesel','hybryda','gaz','elektryczny');
-
 drop table if exists samochody cascade;
 CREATE TABLE samochody
 (
@@ -364,21 +360,24 @@ CREATE TABLE samochody
 	liczba_miejsc numeric(2),
 	liczba_drzwi numeric(2),
 	id_naped numeric(2) REFERENCES rodzaj_napedu NOT NULL,
-	silnik silnik_enum NOT NULL,
+	silnik varchar(20) NOT NULL,
 	przebieg numeric(10),
 	silnik_moc_KM numeric(3),
 	silnik_moc_kW numeric(3),
 	pojemnosc_silnika numeric(4),
 	kolor varchar(20) NOT NULL,
-	skrzynia_biegow skrzynia_enum,
+	skrzynia_biegow varchar(50),
 	spalanie numeric(3,1),
-	bezwypadkowy bool_enum,
+	bezwypadkowy char(3),
 	predkosc_max numeric(3),
 	liczba_biegow numeric(2),
 	id_typ numeric(2) REFERENCES typ NOT NULL,
 	przyspieszenie numeric(3,1),
 
 	CHECK((nowy='TAK' AND przebieg is null) OR (nowy='NIE' AND przebieg is distinct from NULL)),
+	CHECK(bezwypadkowy='TAK' OR bezwypadkowy='NIE'),
+	CHECK(silnik IN('benzyna','diesel','hybryda','gaz','elektryczny')),
+	CHECK(skrzynia_biegow='automatyczna' OR skrzynia_biegow='manualna' OR skrzynia_biegow='CVT' OR skrzynia_biegow='polautomatyczna'),
 	CHECK((nowy='TAK' AND id_klienta is NULL AND bezwypadkowy is NULL) OR (nowy='NIE' AND id_klienta is distinct from NULL AND bezwypadkowy is distinct from NULL)),
 	CHECK((silnik_moc_KM is distinct from NULL AND silnik_moc_kW is distinct from NULL AND silnik_moc_kW<silnik_moc_KM) OR (silnik_moc_KM is distinct from NULL OR silnik_moc_kW is distinct from NULL))
 );
