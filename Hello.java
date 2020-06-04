@@ -403,7 +403,7 @@ public class Hello extends JFrame {
                                 } else {
                                     if (typ == 92) {
                                         String zam=(String) tableModel.getValueAt(liczbaWierszy,i-1);
-                                        if(!zam.equals("")) {
+                                        if(zam!=null){
                                             DateFormat formatter = new SimpleDateFormat("HH:mm:ss");
                                             java.sql.Time zamiana = new java.sql.Time(formatter.parse(zam).getTime());
                                             resultSet.updateTime(i, zamiana);
@@ -416,6 +416,9 @@ public class Hello extends JFrame {
                                         }
                                         //zaden z powyzszych typow
                                         else {
+                                           // Object zamiana =tableModel.getValueAt(liczbaWierszy,i-1);
+                                          //  resultSet.updateObject(i, zamiana);
+                                          //  System.out.println("Object");
                                             JOptionPane.showMessageDialog(null, "Błąd wewnętrzny bazy","", JOptionPane.ERROR_MESSAGE);
                                         }
                                         }
