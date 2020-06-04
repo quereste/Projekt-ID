@@ -390,11 +390,12 @@ CREATE TABLE historia_transakcji
         id_modelu numeric(4) REFERENCES modele,
         data_transakcji date NOT NULL,
         wartosc_transakcji numeric(10) NOT NULL,
-        sprzedaz bool_enum NOT NULL,
+        sprzedaz char(3) NOT NULL,
         id_klienta numeric(6) REFERENCES klienci_salonu,
         komentarz varchar(1000),
 
-	CHECK(id_klienta IS NOT NULL)
+	CHECK(id_klienta IS NOT NULL),
+	CHECK (sprzedaz='TAK' OR sprzedaz='NIE')
 );
 
 --jedna adres email moze zostac tylko raz podany
