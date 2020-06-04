@@ -314,7 +314,7 @@ CREATE TABLE salon
 	CHECK ((otwarcie_pt IS NULL AND zamkniecie_pt IS NULL) 
 	OR (otwarcie_pt IS NOT NULL AND zamkniecie_pt IS NOT NULL AND otwarcie_pt < zamkniecie_pt)),
 	CHECK ((otwarcie_sb IS NULL AND zamkniecie_sb IS NULL) 
-	OR (otwarcie_sb IS NOT NULL AND zamkniecie_sb IS NOT NULL AND otwarcie_sb < zamkniecie_sb))
+	OR (otwarcie_sb IS NOT NULL AND zamkniecie_sb IS NOT NULL AND otwarcie_sb < zamkniecie_sb)),
 	CHECK(tylko_nowe='TAK' OR tylko_nowe='NIE')
 );
 
