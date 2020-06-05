@@ -1,0 +1,20 @@
+
+-dodaæ w bazie nr VIN
+-dodaæ na schemacie nr VIN
+-wymyœliæ ciekawe zapytania i dodaæ przyciski wykonuj¹ce je w aplikacji w sekcji na skróty
+-dodaæ triggery: 
+	*samochód mo¿e miec tylko taki napêd jaki ma jego model (czyli je¿eli dany model w tabeli modele_naped deklaruje na przednie ko³a oraz na cztery ko³a to samochód tego modelu nie mo¿e deklarowaæ napêdu na tylne ko³a)
+	*podobnie z typem
+	*podobnie z wyposa¿eniem, tylko tutaj jest wiêcej zale¿noœci: samochód mo¿e mieæ tylko takie wyposa¿enie jakie deklaruje jego model, ale model mo¿e deklarowaæ tylko takie wyposa¿enie jakie deklaruje jego marka
+-usun¹æ w aplikacji horizontal_scroll chyba ¿e uda siê wprowadziæ przewijanie w poziomie (wtedy kolumny tabeli musia³y by mieæ jak¹œ w³asn¹ szerokoœæ, a nie ka¿da kolumna domyœlnie jest tej samej szerokoœci)
+-dostosowaæ komunikaty b³êdów (teraz np. wpisanie w czasie update do kolumny numerycznej stringa powoduje wyœwietlenie, ¿e byc mo¿e format daty jest z³y)
+-sprawdziæ czy:
+	-ka¿d¹ kolumnê da siê sortowaæ
+	-ka¿d¹ kolumnê da siê aktualizowaæ
+	-czy do ka¿dej tabeli mo¿na dodawaæ wpisy bez b³êdów
+	-czy zostawienie pustego wpisu (jak w bazie dopuszczone jest null) w czasie dodawania nie powoduje niepowodzenia dodania albo innych nieprzewidzianych rzeczy
+	-obs³u¿yæ wyj¹tki w momencie gdy u¿ytkownik wpisze np: 'abc' w miejsce godziny lub daty
+
+Zrobione:
+-powrót z w³asnych typów (enum w psql) do varchar w bazie (nie wiem jak zrzutowaæ je do javy, ¿eby móc dokonywaæ insert i update, mo¿liwe ¿e mozna by dokonywaæ tych operacji w inny sposób, ale moim zdaniem proœciej bêdzie powróciæ do stanu bazy przed wprowadzeniem tych typów enum)
+-dodaæ byæ mo¿e w aplikacje sortowanie wg kolumny ustalonej przez u¿ytkownika (teraz zawsze sortuje po kluczu g³ównym wyœwietlanej tabeli), technicznie mo¿naby to zrobiæ wyœwietlaj¹c odpowiednie JComboBox (czyli zawieraj¹ce nazwy kolumn obecnie wyœwietlonej tabeli)
