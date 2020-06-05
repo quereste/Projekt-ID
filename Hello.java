@@ -1,5 +1,6 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -13,6 +14,8 @@ import javax.swing.event.TableModelListener;
 import java.text.SimpleDateFormat;
 import java.text.DateFormat;
 import java.text.ParseException;
+
+import java.math.BigDecimal;
 
 @SuppressWarnings("serial")
 public class Hello extends JFrame {
@@ -45,6 +48,7 @@ public class Hello extends JFrame {
     JComboBox<String> tabele;
     String str;
     boolean editable;
+    ResultSetMetaData meta;
 
     /**
      * @param args
@@ -55,9 +59,51 @@ public class Hello extends JFrame {
 
     //zamienia result set na tabele
     DefaultTableModel createResultTable(ResultSet row) throws SQLException {
-        ResultSetMetaData meta= row.getMetaData();
-        tableModel= new DefaultTableModel();
+        meta= row.getMetaData();
+        tableModel= new DefaultTableModel()
+        {
+            //nadpisuje, zeby dzialalo porownywanie liczb w tabeli, inaczej porownywane sa jako stringi, czyli zle
+            @Override
+            public Class<?> getColumnClass(int col){
+                //domyslnie typem kolumny jest string
+                Class retVal = String.class;
+                try {
+                    //jezeli jest to jakis prosty typ obecny w javie to dostaniemy klase, w przeciwnym razie przejdziemy do obslugi wyjatkow
+                    if (getRowCount() > 0) {
+                        retVal = getValueAt(0, col).getClass();
+                    }
+                }
+                catch(NullPointerException e){
+                    try {
+                        //typ jest numeryczny, czyli zapisujemy w javie jako bigdecimal
+                        if (meta.getColumnType(col+1) == 2) {
+                            retVal = BigDecimal.class;
+                        } else {
+                            retVal = String.class;
+                        }
+                    }catch(SQLException ex){return String.class;}
+                    return retVal;
+                }
+
+//System.out.println("Pobieranie informacji  "+(col+1));
+                try {
+                    //91 to kod daty, 92 to czas
+                    //chcemy wypisywac jako stringi
+                    //musi to byc jednak object (czyli tak jak by bylo domyslnie nadpisania tej funkcji),bo
+                    //inaczej doszloby do wyjatku spowodowanego niemoznoscia konwwersji daty/czasu do stringu
+                    if (meta.getColumnType(col+1)==91||meta.getColumnType(col+1)==92) {
+                        retVal = Object.class;
+               //         System.out.println("Data "+(col+1));
+                    }
+                }catch(SQLException ex){return String.class;}
+
+                return retVal;
+            }
+        };
+
+
         String cols[]=new String[meta.getColumnCount()];
+
         for(int i=0;i< cols.length;++i) { cols[i]= meta.getColumnLabel(i+1); }
         tableModel.setColumnIdentifiers(cols);
         while(row.next()) {
@@ -81,6 +127,9 @@ public class Hello extends JFrame {
     void wypisz() throws SQLException {
         tableModel=createResultTable(resultSet);
         jTable=new JTable(tableModel);
+       // jTable.setRowSorter(new TableRowSorter(jTable.getModel()));
+        //wlaczone jest sortowanie kolumn (wedlug comparatora dla odpowiedniego typu (uzyskanego z nadpisanej wczesniej metody getcolumnclass))
+        jTable.setAutoCreateRowSorter(true);
         //wylaczone zaznaczanie wierszy i zmienianie zawartosci komorek
         if(!editable){
             jTable.setEnabled(false);
@@ -103,7 +152,7 @@ public class Hello extends JFrame {
                     try {
                         //e.getRow i podobne numeruja od zera, ale pozostali numeruja od 1
                         resultSet.absolute(e.getFirstRow() + 1);
-                        ResultSetMetaData meta = resultSet.getMetaData();
+                        meta = resultSet.getMetaData();
                         int typ = meta.getColumnType(e.getColumn() + 1);
                         //integer||numeric
                         if (typ == 4) {
@@ -114,8 +163,11 @@ public class Hello extends JFrame {
                         //numeric, czyli moga wystapic po kropce cyfry
                         else {
                             if (typ == 2) {
-                                float zamiana = Float.parseFloat((String) tableModel.getValueAt(e.getFirstRow(), e.getColumn()));
-                                resultSet.updateFloat(e.getColumn() + 1, zamiana);
+                           //     float zamiana = Float.parseFloat((String) tableModel.getValueAt(e.getFirstRow(), e.getColumn()));
+                            //    resultSet.updateFloat(e.getColumn() + 1, zamiana);
+                                BigDecimal zamiana = (BigDecimal) tableModel.getValueAt(e.getFirstRow(), e.getColumn());
+                                resultSet.updateBigDecimal(e.getColumn() + 1, zamiana);
+
                                 resultSet.updateRow();
                             }
                             //varchar||char
@@ -369,7 +421,7 @@ public class Hello extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 int liczbaWierszy=0;
                 int i=0;
-                ResultSetMetaData meta= null;
+                meta= null;
 
                 try{
                     if (resultSet.last()) {
@@ -392,8 +444,11 @@ public class Hello extends JFrame {
                         //numeric, czyli moga wystapic po kropce cyfry
                         else {
                             if (typ == 2) {
-                                float zamiana = Float.parseFloat((String) tableModel.getValueAt(liczbaWierszy,i-1));
-                                resultSet.updateFloat(i, zamiana);
+                                BigDecimal zamiana = (BigDecimal) tableModel.getValueAt(liczbaWierszy,i-1);
+                                resultSet.updateBigDecimal(i, zamiana);
+
+                            //    float zamiana = Float.parseFloat((String) tableModel.getValueAt(liczbaWierszy,i-1));
+                           //     resultSet.updateFloat(i, zamiana);
                             }
                             //varchar||char
                             else {
