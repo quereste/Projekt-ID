@@ -66,7 +66,7 @@ public class Hello extends JFrame {
             @Override
             public Class<?> getColumnClass(int col){
                 //domyslnie typem kolumny jest string
-                Class retVal = String.class;
+                Class retVal = Object.class;
                 try {
                     //jezeli jest to jakis prosty typ obecny w javie to dostaniemy klase, w przeciwnym razie przejdziemy do obslugi wyjatkow
                     if (getRowCount() > 0) {
@@ -81,8 +81,11 @@ public class Hello extends JFrame {
                         } else {
                             retVal = String.class;
                         }
-                    }catch(SQLException ex){return String.class;}
-                    return retVal;
+                    }catch(SQLException ex){
+                     //   return Object.class;
+                    }
+                    //jezeli juz bylby return to zdarza sie ze zwroci string dla godziny i nie mozna posortowac godzin bo musza byc objectami
+             //       return retVal;
                 }
 
 //System.out.println("Pobieranie informacji  "+(col+1));
@@ -95,7 +98,7 @@ public class Hello extends JFrame {
                         retVal = Object.class;
                //         System.out.println("Data "+(col+1));
                     }
-                }catch(SQLException ex){return String.class;}
+                }catch(SQLException ex){return Object.class;}
 
                 return retVal;
             }
@@ -154,7 +157,7 @@ public class Hello extends JFrame {
                         resultSet.absolute(e.getFirstRow() + 1);
                         meta = resultSet.getMetaData();
                         int typ = meta.getColumnType(e.getColumn() + 1);
-                        //integer||numeric
+                        //integer (w bazie wystepuje tylko numeric, int nie wystepuje)
                         if (typ == 4) {
                             int zamiana = Integer.parseInt((String) tableModel.getValueAt(e.getFirstRow(), e.getColumn()));
                             resultSet.updateInt(e.getColumn() + 1, zamiana);
@@ -233,13 +236,48 @@ public class Hello extends JFrame {
                             // JOptionPane.showMessageDialog(null, "Aby dodać godzinę otwarcia (zamknięcia) dodaj także godzinę zamknięcia (otwarcia)", "", JOptionPane.WARNING_MESSAGE);
                         }
                     } catch (ParseException exce) {
-                        exce.printStackTrace();
+                        if(godzina) {
+                            String nazwa = exce.getClass().getSimpleName();
+                            //opis wyjatku
+                            String opis = exce.getMessage();
+                            JOptionPane.showMessageDialog(null, "ERROR: Nie można dokonać operacji uaktualnienia \n" +
+                                    "\n" + "Godzina jest prawdopodobnie w złym formacie \n" + "\n" + nazwa + "\n" + opis, "", JOptionPane.ERROR_MESSAGE);
+                            editable = true;
+                            str = "";
+                            str = text.getText();
+                            //jezeli nic nie jest wpisane wtedy pobieramy nazwe z okienka wyboru
+                            if (str.equals("")) {
+                                str = (String) tabele.getSelectedItem();
+                            }
+                            try {
+                                resultSet = statement.executeQuery("select * from " + str + " order by 1");
+                                wypisz();
+                            } catch (SQLException exc) {
+                                exc.printStackTrace();
+                            }
+                        }
+                        else {
+                            exce.printStackTrace();
+                        }
                     } catch(IllegalArgumentException excep){
                         String nazwa = excep.getClass().getSimpleName();
                         //opis wyjatku
                         String opis = excep.getMessage();
                         JOptionPane.showMessageDialog(null, "ERROR: Nie można dokonać operacji uaktualnienia \n" +
-                                "\n" +"Prawdopodobnie data podana jest w błędnym formacie \n"+"\n"+ nazwa + "\n" + opis, "", JOptionPane.ERROR_MESSAGE);
+                                "\n" +"Data jest prawdopodobnie w złym formacie \n"+"\n"+ nazwa + "\n" + opis, "", JOptionPane.ERROR_MESSAGE);
+                        editable = true;
+                        str = "";
+                        str = text.getText();
+                        //jezeli nic nie jest wpisane wtedy pobieramy nazwe z okienka wyboru
+                        if (str.equals("")) {
+                            str = (String) tabele.getSelectedItem();
+                        }
+                        try {
+                            resultSet = statement.executeQuery("select * from " + str + " order by 1");
+                            wypisz();
+                        } catch (SQLException exc) {
+                            exc.printStackTrace();
+                        }
                     }
                 }
                 //edytowany jest wiersz do insertu, nic nie robimy bo dodajemy po wcisnieciu dodaj
@@ -346,7 +384,7 @@ public class Hello extends JFrame {
 
         jTable=new JTable(new DefaultTableModel());
 
-        scroll=new JScrollPane(jTable,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        scroll=new JScrollPane(jTable,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scroll.setSize(new Dimension(this.getWidth()-20,this.getHeight()-300));
         scroll.setPreferredSize(new Dimension(this.getWidth()-20, this.getHeight()-300));
         scroll.setVisible(true);
@@ -435,7 +473,7 @@ public class Hello extends JFrame {
                         i++;
                         System.out.println("numer kolumny: " +i);
                         int typ = meta.getColumnType(i);
-                        //integer||numeric
+                        //integer (w bazie nie wystepuje, wszsytkie liczby pamietane sa jako numeric)
                         if (typ == 4) {
                             //table model indeksuje od zera, result set od jeden
                             int zamiana = Integer.parseInt((String) tableModel.getValueAt(liczbaWierszy,i-1));
@@ -458,7 +496,7 @@ public class Hello extends JFrame {
                                 } else {
                                     if (typ == 92) {
                                         String zam=(String) tableModel.getValueAt(liczbaWierszy,i-1);
-                                        if(zam!=null){
+                                        if(zam!=null&&!zam.equals("")){
                                             DateFormat formatter = new SimpleDateFormat("HH:mm:ss");
                                             java.sql.Time zamiana = new java.sql.Time(formatter.parse(zam).getTime());
                                             resultSet.updateTime(i, zamiana);
@@ -466,7 +504,7 @@ public class Hello extends JFrame {
                                     }
                                     else {
                                         if(typ==91){
-                                            java.sql.Date zamiana =java.sql.Date.valueOf((String) tableModel.getValueAt(liczbaWierszy,i-1));
+                                            java.sql.Date zamiana = java.sql.Date.valueOf((String) tableModel.getValueAt(liczbaWierszy, i - 1));
                                             resultSet.updateDate(i, zamiana);
                                         }
                                         //zaden z powyzszych typow
@@ -493,7 +531,7 @@ public class Hello extends JFrame {
                     }
 
                   //  resultSet.moveToCurrentRow();
-                }catch(SQLException | ParseException ex){
+                }catch(SQLException ex){
                     String nazwa = ex.getClass().getSimpleName();
                     //opis wyjatku
                     String opis = ex.getMessage();
@@ -514,8 +552,19 @@ public class Hello extends JFrame {
                     String opis = exc.getMessage();
                     JOptionPane.showMessageDialog(null, "ERROR: Nie można dokonać operacji wstawienia \n" +
                             "\n"+"Sprawdz czy wartość w kolumnie "+nazwaCol+" jest odpowiedniego typu \n"+"\n" + nazwa + "\n" + opis, "", JOptionPane.ERROR_MESSAGE);
+                }catch(ParseException excep){
+                    String nazwa = excep.getClass().getSimpleName();
+                    //opis wyjatku
+                    String opis = excep.getMessage();
+                    JOptionPane.showMessageDialog(null, "ERROR: Nie można dokonać operacji wstawienia \n" +
+                            "\n"+"Sprawdz czy godzina jest w dobrym formacie \n"+"\n" + nazwa + "\n" + opis, "", JOptionPane.ERROR_MESSAGE);
+                }catch(IllegalArgumentException except){
+                    String nazwa = except.getClass().getSimpleName();
+                    //opis wyjatku
+                    String opis = except.getMessage();
+                    JOptionPane.showMessageDialog(null, "ERROR: Nie można dokonać operacji wstawienia \n" +
+                            "\n"+"Sprawdz czy data jest w dobrym formacie \n"+"\n" + nazwa + "\n" + opis, "", JOptionPane.ERROR_MESSAGE);
                 }
-
             }
         });
 
