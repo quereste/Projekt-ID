@@ -40,9 +40,12 @@ CREATE TABLE modele
 	poczatek_produkcji numeric(4),
 	koniec_produkcji numeric(4),
 
-	CONSTRAINT modele_poczatekProd_przed_koniecProd CHECK (poczatek_produkcji<=koniec_produkcji),
+	
 	CONSTRAINT modele_poprawnySegment CHECK (segment IN ('A','B','C','D','E','F','S','M','J')),
-	CONSTRAINT modele_uq_modelMarka UNIQUE (model, id_marka)
+	CONSTRAINT modele_uq_modelMarka UNIQUE (model, id_marka),
+	CONSTRAINT modele_mozliwyRok_poczatekProd CHECK(poczatek_produkcji >= 1908 AND poczatek_produkcji <= date_part('year', CURRENT_DATE)),
+	CONSTRAINT modele_mozliwyRok_koniecProd CHECK(koniec_produkcji >= 1908 AND koniec_produkcji <= date_part('year', CURRENT_DATE)),
+	CONSTRAINT modele_poczatekProd_przed_koniecProd CHECK (poczatek_produkcji<=koniec_produkcji)
 );
 
 insert into modele (id_marka,id_model,model,segment,poczatek_produkcji,
@@ -380,7 +383,8 @@ CREATE TABLE samochody
 	CONSTRAINT samochody_poprawnySilnik CHECK(silnik IN('benzyna','diesel','hybryda','gaz','elektryczny')),
 	CONSTRAINT samochody_poprawnaSkrzynia CHECK(skrzynia_biegow='automatyczna' OR skrzynia_biegow='manualna' OR skrzynia_biegow='CVT' OR skrzynia_biegow='polautomatyczna'),
 	CONSTRAINT samochody_nowyBezwypadkowyFabryczny_OR_uzywany CHECK((nowy='TAK' AND id_klienta is NULL AND bezwypadkowy is NULL) OR (nowy='NIE' AND id_klienta is distinct from NULL AND bezwypadkowy is distinct from NULL)),
-	CONSTRAINT samochody_mocSilnika CHECK((silnik_moc_KM is distinct from NULL AND silnik_moc_kW is distinct from NULL AND silnik_moc_kW<silnik_moc_KM) OR (silnik_moc_KM is distinct from NULL OR silnik_moc_kW is distinct from NULL))
+	CONSTRAINT samochody_mocSilnika CHECK((silnik_moc_KM is distinct from NULL AND silnik_moc_kW is distinct from NULL AND silnik_moc_kW<silnik_moc_KM) OR (silnik_moc_KM is distinct from NULL OR silnik_moc_kW is distinct from NULL)),
+	CONSTRAINT samochody_poprawnyRok CHECK(rok_produkcji >= 1908 AND rok_produkcji <= date_part('year', CURRENT_DATE))
 );
 
 drop table if exists historia_transakcji cascade;
