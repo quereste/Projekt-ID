@@ -5,7 +5,7 @@ CREATE TABLE marki
 	nazwa varchar(50) NOT NULL,
 	nazwa_koncernu varchar(100),
 
-	UNIQUE (nazwa)
+	CONSTRAINT marki_uq_nazwa UNIQUE (nazwa)
 );
 
 insert into marki (id_marka, nazwa, nazwa_koncernu) values 
@@ -40,9 +40,9 @@ CREATE TABLE modele
 	poczatek_produkcji numeric(4),
 	koniec_produkcji numeric(4),
 
-	CHECK (poczatek_produkcji<=koniec_produkcji),
-	CHECK (segment IN ('A','B','C','D','E','F','S','M','J')),
-	UNIQUE (model, id_marka)
+	CONSTRAINT modele_poczatekProd_przed_koniecProd CHECK (poczatek_produkcji<=koniec_produkcji),
+	CONSTRAINT modele_poprawnySegment CHECK (segment IN ('A','B','C','D','E','F','S','M','J')),
+	CONSTRAINT modele_uq_modelMarka UNIQUE (model, id_marka)
 );
 
 insert into modele (id_marka,id_model,model,segment,poczatek_produkcji,
@@ -77,7 +77,7 @@ CREATE TABLE typ
 	id_typ numeric(2) PRIMARY KEY,
 	nazwa varchar(30) UNIQUE,
 
-	CHECK(nazwa IS NOT NULL)
+	CONSTRAINT typ_notNull_nazwa CHECK(nazwa IS NOT NULL)
 );
 
 insert into typ(id_typ, nazwa) values
@@ -182,7 +182,7 @@ CREATE TABLE rodzaj_napedu
 	id_naped numeric(2) PRIMARY KEY,
 	nazwa varchar(20) UNIQUE,
 
-	CHECK(nazwa IS NOT NULL)
+	CONSTRAINT rodzaj_napedu_notNull_nazwa CHECK(nazwa IS NOT NULL)
 );
 
 insert into rodzaj_napedu (id_naped,nazwa) values 
@@ -224,7 +224,7 @@ CREATE TABLE kraje
 	id_kraju numeric(3) PRIMARY KEY,
 	nazwa varchar(50) UNIQUE,
 
-	CHECK(nazwa IS NOT NULL)
+	CONSTRAINT kraje_notNull_nazwa CHECK(nazwa IS NOT NULL)
 );
 
 insert into kraje(id_kraju,nazwa) values 
@@ -303,19 +303,19 @@ CREATE TABLE salon
 	otwarcie_sb time,
 	zamkniecie_sb time,
 	
-	CHECK ((otwarcie_pon IS NULL AND zamkniecie_pon IS NULL) 
+	CONSTRAINT salon_godzinyPon CHECK ((otwarcie_pon IS NULL AND zamkniecie_pon IS NULL) 
 	OR (otwarcie_pon IS NOT NULL AND zamkniecie_pon IS NOT NULL AND otwarcie_pon < zamkniecie_pon)),
-	CHECK ((otwarcie_wt IS NULL AND zamkniecie_wt IS NULL) 
+	CONSTRAINT salon_godzinyWt CHECK ((otwarcie_wt IS NULL AND zamkniecie_wt IS NULL) 
 	OR (otwarcie_wt IS NOT NULL AND zamkniecie_wt IS NOT NULL AND otwarcie_wt < zamkniecie_wt)),
-	CHECK ((otwarcie_sro IS NULL AND zamkniecie_sro IS NULL) 
+	CONSTRAINT salon_godzinySro CHECK ((otwarcie_sro IS NULL AND zamkniecie_sro IS NULL) 
 	OR (otwarcie_sro IS NOT NULL AND zamkniecie_sro IS NOT NULL AND otwarcie_sro < zamkniecie_sro)),
-	CHECK ((otwarcie_czw IS NULL AND zamkniecie_czw IS NULL) 
+	CONSTRAINT salon_godzinyCzw CHECK ((otwarcie_czw IS NULL AND zamkniecie_czw IS NULL) 
 	OR (otwarcie_czw IS NOT NULL AND zamkniecie_czw IS NOT NULL AND otwarcie_czw < zamkniecie_czw)),
-	CHECK ((otwarcie_pt IS NULL AND zamkniecie_pt IS NULL) 
+	CONSTRAINT salon_godzinyPt CHECK ((otwarcie_pt IS NULL AND zamkniecie_pt IS NULL) 
 	OR (otwarcie_pt IS NOT NULL AND zamkniecie_pt IS NOT NULL AND otwarcie_pt < zamkniecie_pt)),
-	CHECK ((otwarcie_sb IS NULL AND zamkniecie_sb IS NULL) 
+	CONSTRAINT salon_godzinySb CHECK ((otwarcie_sb IS NULL AND zamkniecie_sb IS NULL) 
 	OR (otwarcie_sb IS NOT NULL AND zamkniecie_sb IS NOT NULL AND otwarcie_sb < zamkniecie_sb)),
-	CHECK(tylko_nowe='TAK' OR tylko_nowe='NIE')
+	CONSTRAINT salon_bool_tylkoNowe CHECK(tylko_nowe='TAK' OR tylko_nowe='NIE')
 );
 
 drop table if exists doradcy cascade;
@@ -341,9 +341,9 @@ CREATE TABLE klienci_salonu
 	email varchar(50),
 	newsletter char(3) NOT NULL,
 
-	CHECK (telefon IS NOT NULL OR email IS NOT NULL),
-	CHECK((imie IS NOT NULL AND nazwisko IS NOT NULL) OR nazwa IS NOT NULL),
-	CHECK((newsletter='TAK' AND email IS NOT NULL) OR newsletter='NIE')
+	CONSTRAINT klienci_salonu_notNull_tel_OR_mail CHECK (telefon IS NOT NULL OR email IS NOT NULL),
+	CONSTRAINT klienci_salonu_notNull_imieNazwisko_OR_nazwa CHECK((imie IS NOT NULL AND nazwisko IS NOT NULL) OR nazwa IS NOT NULL),
+	CONSTRAINT klienci_salonu_bool_newsletter CHECK((newsletter='TAK' AND email IS NOT NULL) OR newsletter='NIE')
 );
 
 drop table if exists samochody cascade;
@@ -374,13 +374,13 @@ CREATE TABLE samochody
 	id_typ numeric(2) REFERENCES typ NOT NULL,
 	przyspieszenie numeric(3,1),
 	
-	CHECK(vin ~ '[A-HJ-NPR-Z0-9]{17}'),
-	CHECK((nowy='TAK' AND przebieg is null) OR (nowy='NIE' AND przebieg is distinct from NULL)),
-	CHECK(bezwypadkowy='TAK' OR bezwypadkowy='NIE'),
-	CHECK(silnik IN('benzyna','diesel','hybryda','gaz','elektryczny')),
-	CHECK(skrzynia_biegow='automatyczna' OR skrzynia_biegow='manualna' OR skrzynia_biegow='CVT' OR skrzynia_biegow='polautomatyczna'),
-	CHECK((nowy='TAK' AND id_klienta is NULL AND bezwypadkowy is NULL) OR (nowy='NIE' AND id_klienta is distinct from NULL AND bezwypadkowy is distinct from NULL)),
-	CHECK((silnik_moc_KM is distinct from NULL AND silnik_moc_kW is distinct from NULL AND silnik_moc_kW<silnik_moc_KM) OR (silnik_moc_KM is distinct from NULL OR silnik_moc_kW is distinct from NULL))
+	CONSTRAINT samochody_legalVin CHECK(vin ~ '[A-HJ-NPR-Z0-9]{17}'),
+	CONSTRAINT samochody_nowyBezPrzebiegu_OR_uzywanyZPrzebiegiem CHECK((nowy='TAK' AND przebieg is null) OR (nowy='NIE' AND przebieg is distinct from NULL)),
+	CONSTRAINT samochody_bool_bezwypadkowy CHECK(bezwypadkowy='TAK' OR bezwypadkowy='NIE'),
+	CONSTRAINT samochody_poprawnySilnik CHECK(silnik IN('benzyna','diesel','hybryda','gaz','elektryczny')),
+	CONSTRAINT samochody_poprawnaSkrzynia CHECK(skrzynia_biegow='automatyczna' OR skrzynia_biegow='manualna' OR skrzynia_biegow='CVT' OR skrzynia_biegow='polautomatyczna'),
+	CONSTRAINT samochody_nowyBezwypadkowyFabryczny_OR_uzywany CHECK((nowy='TAK' AND id_klienta is NULL AND bezwypadkowy is NULL) OR (nowy='NIE' AND id_klienta is distinct from NULL AND bezwypadkowy is distinct from NULL)),
+	CONSTRAINT samochody_mocSilnika CHECK((silnik_moc_KM is distinct from NULL AND silnik_moc_kW is distinct from NULL AND silnik_moc_kW<silnik_moc_KM) OR (silnik_moc_KM is distinct from NULL OR silnik_moc_kW is distinct from NULL))
 );
 
 drop table if exists historia_transakcji cascade;
@@ -395,8 +395,8 @@ CREATE TABLE historia_transakcji
         id_klienta numeric(6) REFERENCES klienci_salonu,
         komentarz varchar(1000),
 
-	CHECK(id_klienta IS NOT NULL),
-	CHECK (sprzedaz='TAK' OR sprzedaz='NIE')
+	CONSTRAINT historia_transakcji_notNull_id_klienta CHECK(id_klienta IS NOT NULL),
+	CONSTRAINT historia_transakcji_bool_sprzedaz CHECK (sprzedaz='TAK' OR sprzedaz='NIE')
 );
 
 --jedna adres email moze zostac tylko raz podany
