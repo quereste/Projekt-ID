@@ -1,5 +1,4 @@
 
--pozwolić tylko na czterocyfrowe daty produkcji o pierwszej cyfrie 1 lub 2 (obecnie można w modelach i samochodach wpisać rok produkcji np. 123)
 -dodać na schemacie nr VIN
 -wymyślić ciekawe zapytania i dodać przyciski wykonujące je w aplikacji w sekcji na skróty
 -dodać triggery: 
@@ -13,6 +12,7 @@
 
 Zrobione:
 -dodać w bazie nr VIN
+-pozwolić tylko na czterocyfrowe daty produkcji o pierwszej cyfrie 1 lub 2 (obecnie można w modelach i samochodach wpisać rok produkcji np. 123)
 -nadać check-om wykonywanym w bazie nazwy (teraz użytkownikowi ciężko jest się domyśleć czemu jego dane są niedozwolnone w bazie)
 -powrót z własnych typów (enum w psql) do varchar w bazie (nie wiem jak zrzutować je do javy, żeby móc dokonywać insert i update, możliwe że mozna by dokonywać tych operacji w inny sposób, ale moim zdaniem prościej będzie powrócić do stanu bazy przed wprowadzeniem tych typów enum)
 -dodać być może w aplikacje sortowanie wg kolumny ustalonej przez użytkownika (teraz zawsze sortuje po kluczu głównym wyświetlanej tabeli), technicznie możnaby to zrobić wyświetlając odpowiednie JComboBox (czyli zawierające nazwy kolumn obecnie wyświetlonej tabeli)
