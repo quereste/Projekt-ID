@@ -1,19 +1,19 @@
 
--nadaæ check-om wykonywanym w bazie nazwy (teraz u¿ytkownikowi ciê¿ko jest siê domyœleæ czemu jego dane s¹ niedozwolnone w bazie)
--pozwoliæ tylko na czterocyfrowe daty produkcji o pierwszej cyfrie 1 lub 2 (obecnie mo¿na w modelach i samochodach wpisaæ rok produkcji np. 123)
--dodaæ w bazie nr VIN
--dodaæ na schemacie nr VIN
--wymyœliæ ciekawe zapytania i dodaæ przyciski wykonuj¹ce je w aplikacji w sekcji na skróty
--dodaæ triggery: 
-	*samochód mo¿e miec tylko taki napêd jaki ma jego model (czyli je¿eli dany model w tabeli modele_naped deklaruje na przednie ko³a oraz na cztery ko³a to samochód tego modelu nie mo¿e deklarowaæ napêdu na tylne ko³a)
+-pozwoliÄ‡ tylko na czterocyfrowe daty produkcji o pierwszej cyfrie 1 lub 2 (obecnie moÅ¼na w modelach i samochodach wpisaÄ‡ rok produkcji np. 123)
+-dodaÄ‡ na schemacie nr VIN
+-wymyÅ›liÄ‡ ciekawe zapytania i dodaÄ‡ przyciski wykonujÄ…ce je w aplikacji w sekcji na skrÃ³ty
+-dodaÄ‡ triggery: 
+	*samochÃ³d moÅ¼e miec tylko taki napÄ™d jaki ma jego model (czyli jeÅ¼eli dany model w tabeli modele_naped deklaruje na przednie koÅ‚a oraz na cztery koÅ‚a to samochÃ³d tego modelu nie moÅ¼e deklarowaÄ‡ napÄ™du na tylne koÅ‚a)
 	*podobnie z typem
-	*podobnie z wyposa¿eniem, tylko tutaj jest wiêcej zale¿noœci: samochód mo¿e mieæ tylko takie wyposa¿enie jakie deklaruje jego model, ale model mo¿e deklarowaæ tylko takie wyposa¿enie jakie deklaruje jego marka
-	*samochod moze miec tylko tak¹ datê produkcji jak¹ dopuszcza jego model
--dostosowaæ komunikaty b³êdów
+	*podobnie z wyposaÅ¼eniem, tylko tutaj jest wiÄ™cej zaleÅ¼noÅ›ci: samochÃ³d moÅ¼e mieÄ‡ tylko takie wyposaÅ¼enie jakie deklaruje jego model, ale model moÅ¼e deklarowaÄ‡ tylko takie wyposaÅ¼enie jakie deklaruje jego marka
+	*samochod moze miec tylko takÄ… datÄ™ produkcji jakÄ… dopuszcza jego model
+-dostosowaÄ‡ komunikaty bÅ‚Ä™dÃ³w
 -usuwanie w aplikacji mozliwe jest tylko w pierwotnym wypisaniu, jezeli uzytkownik posortuje dane to usuwanie i tak chce usunac ten wiersz jakby tabela byla nieposortowana
 
 
 Zrobione:
--powrót z w³asnych typów (enum w psql) do varchar w bazie (nie wiem jak zrzutowaæ je do javy, ¿eby móc dokonywaæ insert i update, mo¿liwe ¿e mozna by dokonywaæ tych operacji w inny sposób, ale moim zdaniem proœciej bêdzie powróciæ do stanu bazy przed wprowadzeniem tych typów enum)
--dodaæ byæ mo¿e w aplikacje sortowanie wg kolumny ustalonej przez u¿ytkownika (teraz zawsze sortuje po kluczu g³ównym wyœwietlanej tabeli), technicznie mo¿naby to zrobiæ wyœwietlaj¹c odpowiednie JComboBox (czyli zawieraj¹ce nazwy kolumn obecnie wyœwietlonej tabeli)
--usun¹æ w aplikacji horizontal_scroll chyba ¿e uda siê wprowadziæ przewijanie w poziomie (wtedy kolumny tabeli musia³y by mieæ jak¹œ w³asn¹ szerokoœæ, a nie ka¿da kolumna domyœlnie jest tej samej szerokoœci)
+-dodaÄ‡ w bazie nr VIN
+-nadaÄ‡ check-om wykonywanym w bazie nazwy (teraz uÅ¼ytkownikowi ciÄ™Å¼ko jest siÄ™ domyÅ›leÄ‡ czemu jego dane sÄ… niedozwolnone w bazie)
+-powrÃ³t z wÅ‚asnych typÃ³w (enum w psql) do varchar w bazie (nie wiem jak zrzutowaÄ‡ je do javy, Å¼eby mÃ³c dokonywaÄ‡ insert i update, moÅ¼liwe Å¼e mozna by dokonywaÄ‡ tych operacji w inny sposÃ³b, ale moim zdaniem proÅ›ciej bÄ™dzie powrÃ³ciÄ‡ do stanu bazy przed wprowadzeniem tych typÃ³w enum)
+-dodaÄ‡ byÄ‡ moÅ¼e w aplikacje sortowanie wg kolumny ustalonej przez uÅ¼ytkownika (teraz zawsze sortuje po kluczu gÅ‚Ã³wnym wyÅ›wietlanej tabeli), technicznie moÅ¼naby to zrobiÄ‡ wyÅ›wietlajÄ…c odpowiednie JComboBox (czyli zawierajÄ…ce nazwy kolumn obecnie wyÅ›wietlonej tabeli)
+-usunÄ…Ä‡ w aplikacji horizontal_scroll chyba Å¼e uda siÄ™ wprowadziÄ‡ przewijanie w poziomie (wtedy kolumny tabeli musiaÅ‚y by mieÄ‡ jakÄ…Å› wÅ‚asnÄ… szerokoÅ›Ä‡, a nie kaÅ¼da kolumna domyÅ›lnie jest tej samej szerokoÅ›ci)
