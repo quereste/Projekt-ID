@@ -349,7 +349,7 @@ CREATE TABLE klienci_salonu
 drop table if exists samochody cascade;
 CREATE TABLE samochody
 (
-	id_samochodu numeric(10) PRIMARY KEY,
+	vin char(17) PRIMARY KEY,
 	id_model numeric(8) REFERENCES modele NOT NULL,
 	id_klienta numeric(8) REFERENCES klienci_salonu, 
 	id_wyposazenie numeric(10) REFERENCES wyposazenie,
@@ -373,7 +373,8 @@ CREATE TABLE samochody
 	liczba_biegow numeric(2),
 	id_typ numeric(2) REFERENCES typ NOT NULL,
 	przyspieszenie numeric(3,1),
-
+	
+	CHECK(vin ~ '[A-HJ-NPR-Z0-9]{17}'),
 	CHECK((nowy='TAK' AND przebieg is null) OR (nowy='NIE' AND przebieg is distinct from NULL)),
 	CHECK(bezwypadkowy='TAK' OR bezwypadkowy='NIE'),
 	CHECK(silnik IN('benzyna','diesel','hybryda','gaz','elektryczny')),
@@ -648,53 +649,53 @@ $uzywany$ LANGUAGE plpgsql;
 CREATE TRIGGER uzywany BEFORE INSERT OR UPDATE ON samochody
 FOR EACH ROW EXECUTE PROCEDURE uzywany();
 
-insert into samochody(id_salon, id_model,id_samochodu,cena,nowy,liczba_drzwi,kolor,id_wyposazenie,
+insert into samochody(id_salon, id_model,vin,cena,nowy,liczba_drzwi,kolor,id_wyposazenie,
 rok_produkcji,liczba_miejsc,id_naped,silnik,spalanie,skrzynia_biegow,liczba_biegow,
 silnik_moc_KM,predkosc_max,id_typ,przyspieszenie, id_klienta, przebieg, bezwypadkowy) values
-(1, 10, 11, 34000, 'NIE',  5, 'zielony', 14, 2016, 5, 3,  'hybryda',  6.6, 'manualna', 6, 223, 210, 3, 8.3, 4, 67000, 'NIE'),
-(6, 10, 12, 19200, 'NIE', 5, 'bialy', 16, 2015, 5, 3, 'benzyna', 7.0, 'manualna', 6, 245, 210, 3, 8.3, 27, 84000, 'TAK'),
-(4, 10, 13, 49000, 'NIE', 5, 'zolty', 15, 2017, 5, 3, 'diesel', 6.0, 'automatyczna', 6, 169, 190, 3, 9.3, 7, 59000, 'TAK'),
-(5, 3, 14, 35900, 'NIE', 5, 'bordowy', 2, 2017, 5, 1, 'benzyna', 7.2, 'manualna', 6, 184, 212, 1, 8.1, 24, 57000, 'TAK'),
-(2, 3, 15, 27000, 'NIE', 5, 'czarny', 3, 2017, 5, 1, 'diesel', 5.4, 'automatyczna', 8, 190, 212, 1, 8.0, 7, 70000, 'NIE'),
-(1, 3, 16, 45300, 'NIE', 5, 'pomaranczowy', 4, 2018, 5, 1,'benzyna', 8.6, 'manualna', 6, 360, 250, 1, 4.9, 9, 39000, 'TAK'),
-(5, 4, 17, 22900, 'NIE', 5, 'srebrny', 1, 2006, 5, 1, 'benzyna', 9.0, 'automatyczna', 5, 231, 202, 1, 8.5, 27, 98000, 'TAK'),
-(5, 4, 18, 17800, 'NIE', 5, 'blekitny', 1, 2002, 5, 1, 'diesel', 6.6, 'manualna', 6, 184, 200, 1, 10.1, 26, 112000, 'TAK'),
-(2, 5, 19, 23000, 'NIE', 5, 'szary', 1, 2008, 5, 1, 'benzyna', 11.0, 'manualna', 6, 306, 240, 1, 6.7, 36, 97000, 'TAK'),
-(2, 5, 20, 17000, 'NIE', 5, 'szary', 1, 2008, 5, 1, 'benzyna', 11.0, 'manualna', 6, 306, 240, 1, 6.7, 36, 94300, 'NIE'),
-(2, 5, 21, 18500, 'NIE', 5, 'szary', 1, 2008, 5, 1, 'benzyna', 11.0, 'manualna', 6, 306, 240, 1, 6.7, 36, 102500, 'TAK'),
-(2, 5, 22, 16900, 'NIE', 5, 'szary', 1, 2008, 5, 1, 'benzyna', 11.0, 'manualna', 6, 306, 240, 1, 6.7, 36, 82300, 'NIE'),
-(6, 7, 23, 4300, 'NIE', 5, 'granatowy', NULL, 1998, 5,  2, 'benzyna', 8.1, 'automatyczna', 4,  75, 170, 4, 13.2, 29,  143900, 'TAK'),
-(1, 7, 24, 3900, 'NIE', 5, 'karmazynowy', NULL, 1997, 5, 2, 'benzyna', 8.1, 'manualna', 5, 71, 170, 4, 13.3, 28, 162000, 'TAK'),
-(2, 7, 25, 2300, 'NIE', 5, 'czarny', NULL, 1996, 5, 2, 'diesel', 5.4, 'automatyczna', 4,  68, 165, 4, 16.5, 7, 173000, 'NIE')
+(1, 10, 'WBADE6322VBW51982', 34000, 'NIE',  5, 'zielony', 14, 2016, 5, 3,  'hybryda',  6.6, 'manualna', 6, 223, 210, 3, 8.3, 4, 67000, 'NIE'),
+(6, 10, '1HD1GPM15CC339172', 19200, 'NIE', 5, 'bialy', 16, 2015, 5, 3, 'benzyna', 7.0, 'manualna', 6, 245, 210, 3, 8.3, 27, 84000, 'TAK'),
+(4, 10, '1FMYU92ZX5KD13670', 49000, 'NIE', 5, 'zolty', 15, 2017, 5, 3, 'diesel', 6.0, 'automatyczna', 6, 169, 190, 3, 9.3, 7, 59000, 'TAK'),
+(5, 3, '5J6RE4H48BL023237', 35900, 'NIE', 5, 'bordowy', 2, 2017, 5, 1, 'benzyna', 7.2, 'manualna', 6, 184, 212, 1, 8.1, 24, 57000, 'TAK'),
+(2, 3, '1FUJA6CV74DM34063', 27000, 'NIE', 5, 'czarny', 3, 2017, 5, 1, 'diesel', 5.4, 'automatyczna', 8, 190, 212, 1, 8.0, 7, 70000, 'NIE'),
+(1, 3, '5N3ZA0NE6AN906847', 45300, 'NIE', 5, 'pomaranczowy', 4, 2018, 5, 1,'benzyna', 8.6, 'manualna', 6, 360, 250, 1, 4.9, 9, 39000, 'TAK'),
+(5, 4, '4A3AB76T68E011282', 22900, 'NIE', 5, 'srebrny', 1, 2006, 5, 1, 'benzyna', 9.0, 'automatyczna', 5, 231, 202, 1, 8.5, 27, 98000, 'TAK'),
+(5, 4, '1N4BA41E74C829102', 17800, 'NIE', 5, 'blekitny', 1, 2002, 5, 1, 'diesel', 6.6, 'manualna', 6, 184, 200, 1, 10.1, 26, 112000, 'TAK'),
+(2, 5, '1GMDX03E8VD266902', 23000, 'NIE', 5, 'szary', 1, 2008, 5, 1, 'benzyna', 11.0, 'manualna', 6, 306, 240, 1, 6.7, 36, 97000, 'TAK'),
+(2, 5, '1GBJ7D1B4BV132373', 17000, 'NIE', 5, 'szary', 1, 2008, 5, 1, 'benzyna', 11.0, 'manualna', 6, 306, 240, 1, 6.7, 36, 94300, 'NIE'),
+(2, 5, 'YV1672MK9D2304784', 18500, 'NIE', 5, 'szary', 1, 2008, 5, 1, 'benzyna', 11.0, 'manualna', 6, 306, 240, 1, 6.7, 36, 102500, 'TAK'),
+(2, 5, 'JH4KA4630LC007479', 16900, 'NIE', 5, 'szary', 1, 2008, 5, 1, 'benzyna', 11.0, 'manualna', 6, 306, 240, 1, 6.7, 36, 82300, 'NIE'),
+(6, 7, '1FV3GFBC0YHA74039', 4300, 'NIE', 5, 'granatowy', NULL, 1998, 5,  2, 'benzyna', 8.1, 'automatyczna', 4,  75, 170, 4, 13.2, 29,  143900, 'TAK'),
+(1, 7, 'SCBLC37F85CX10207', 3900, 'NIE', 5, 'karmazynowy', NULL, 1997, 5, 2, 'benzyna', 8.1, 'manualna', 5, 71, 170, 4, 13.3, 28, 162000, 'TAK'),
+(2, 7, 'JHMFA16586S014014', 2300, 'NIE', 5, 'czarny', NULL, 1996, 5, 2, 'diesel', 5.4, 'automatyczna', 4,  68, 165, 4, 16.5, 7, 173000, 'NIE')
 ;
 
-insert into samochody(id_salon, id_model,id_samochodu,cena,nowy,liczba_drzwi,kolor,id_wyposazenie,
+insert into samochody(id_salon, id_model, vin ,cena,nowy,liczba_drzwi,kolor,id_wyposazenie,
 rok_produkcji,liczba_miejsc,id_naped,silnik,spalanie,skrzynia_biegow,liczba_biegow,
 silnik_moc_KM,predkosc_max,id_typ,przyspieszenie) values 
-(1,1,1,159100,'TAK',5,'niebieski',1,2018,5,2,'benzyna',5.9,'manualna',6,192,225,2,7.7),
-(1, 1, 8, 143900, 'TAK', 5, 'srebrny', 2, 2012, 5, 1, 'benzyna', 7.2, 'automatyczna', 8, 245,240, 2, 6.4),
-(1, 1, 9, 162100, 'TAK', 5, 'czarny', 5, 2016, 5, 3, 'diesel', 5.2, 'automatyczna', 8, 116, 189, 2, 11.3),
-(1, 6,4,543540,'TAK',5,'niebieski',7,2019,4,3,'diesel',6.8,'automatyczna',8,422,285,5,4.5)
+(1,1,'WDCGG8HB0AF462890',159100,'TAK',5,'niebieski',1,2018,5,2,'benzyna',5.9,'manualna',6,192,225,2,7.7),
+(1, 1, 'WP1AB29P99LA40680', 143900, 'TAK', 5, 'srebrny', 2, 2012, 5, 1, 'benzyna', 7.2, 'automatyczna', 8, 245,240, 2, 6.4),
+(1, 1, '2C3CCAET4CH256062', 162100, 'TAK', 5, 'czarny', 5, 2016, 5, 3, 'diesel', 5.2, 'automatyczna', 8, 116, 189, 2, 11.3),
+(1, 6,'1J4GZ58S9VC710649',543540,'TAK',5,'niebieski',7,2019,4,3,'diesel',6.8,'automatyczna',8,422,285,5,4.5)
 ;
 
-insert into samochody (id_salon, id_model,id_samochodu,cena,nowy,liczba_drzwi,kolor,
+insert into samochody (id_salon, id_model,vin,cena,nowy,liczba_drzwi,kolor,
 rok_produkcji,liczba_miejsc,id_naped,silnik,spalanie,skrzynia_biegow,liczba_biegow,
 silnik_moc_KM,predkosc_max,id_typ) values 
-(1, 13,5,59600,'TAK',5,'srebrny',2020,5,2,'diesel',3.5,'manualna',6,90,175,7)
+(1, 13,'KM8JT3AC2DU583865',59600,'TAK',5,'srebrny',2020,5,2,'diesel',3.5,'manualna',6,90,175,7)
 ;
 
-insert into samochody (id_salon, id_model,id_samochodu,cena,nowy,liczba_drzwi,kolor,id_wyposazenie,
+insert into samochody (id_salon, id_model,vin,cena,nowy,liczba_drzwi,kolor,id_wyposazenie,
 rok_produkcji,liczba_miejsc,id_naped,silnik,spalanie,skrzynia_biegow,
 silnik_moc_KM,predkosc_max,id_typ) values 
-(1, 10,2,199000,'TAK',4,'czarny',14,2018,5,3,'hybryda',4.2,'CVT',223,200,3),
-(1, 11,3,291900,'TAK',4,'srebrny',13,2019,5,1,'hybryda',5.9,'CVT',345,250,3)
+(1, 10,'1C4GJWAG0DL544058',199000,'TAK',4,'czarny',14,2018,5,3,'hybryda',4.2,'CVT',223,200,3),
+(1, 11,'JF1GV7F67DG002982',291900,'TAK',4,'srebrny',13,2019,5,1,'hybryda',5.9,'CVT',345,250,3)
 ;
 
-insert into samochody (id_salon, id_model,id_samochodu,cena,nowy,liczba_drzwi,kolor,id_wyposazenie,
+insert into samochody (id_salon, id_model,vin,cena,nowy,liczba_drzwi,kolor,id_wyposazenie,
 rok_produkcji,liczba_miejsc,id_naped,silnik,spalanie,silnik_moc_kW,
 silnik_moc_KM,predkosc_max,id_typ,przyspieszenie) values 
-(1, 14,6,159000,'TAK',4,'niebieski',14,2020,4,3,'elektryczny',0,125,170,150,6,7.3),
-(1, 15,7,617136,'TAK',4,'bialy',8,2020,4,1,'elektryczny',0,460,625,260,3,3.2)
+(1, 14,'WBAHD5313MBF95736',159000,'TAK',4,'niebieski',14,2020,4,3,'elektryczny',0,125,170,150,6,7.3),
+(1, 15,'JH4DA3360JS015375',617136,'TAK',4,'bialy',8,2020,4,1,'elektryczny',0,460,625,260,3,3.2)
 ;
 
 insert into historia_transakcji(id_transakcji, id_salon, id_modelu, data_transakcji, wartosc_transakcji, sprzedaz, id_klienta, komentarz) values
