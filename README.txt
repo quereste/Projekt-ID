@@ -20,3 +20,18 @@ Tabela modele zawiera z kolei ogólne informacje dotyczące modeli samochodów, 
 W tabeli marki wymieniliśmy jako pole nazwę koncernu, w którego skład dana marka wchodzi.
 
 Tabelą opisującą działalność kupno/sprzedaż wszystkich filii jest tabela historia_transakcji. Każda transakcja opisywana jest przez numer salonu, który ją finalizował, jej wartość pieniężną oraz informację, czy samochód został sprzedany, czy też nabyty. W obu tych przypadkach notujemy "id_klienta": w pierwszym przypadku klient pozyskał od sieci pojazd, zaś w drugim sprzedał jej swoje auto. W tej tabeli, by nie pamiętać numerów identyfikacyjnych wszystkich obiektów - samochodów, które kiedykolwiek przeszły przez oddziały sieci, zdecydowaliśmy identyfikować samochody będące przedmiotem transakcji za pomocą ich "id_modelu".
+
+
+
+Aplikację wymaga następującego pliku: postgresql-42.2.12.jar  (https://jdbc.postgresql.org/download.html/download/postgresql-42.2.12.jar).
+
+Przed uruchomieniem należy się upewnić, że wczytany został plik create.sql.
+
+Z wiersza poleceń w linuxie aplikację możemy uruchomić następująco (w folderze w którym wykonujemy polecenia znajdują się plik źródłowy Hello.java oraz postgresql-42.2.12.jar):
+1. javac Hello.java
+2. java -cp .:postgresql-42.2.12.jar Hello
+
+Pojawi się okienko proszące o podanie danych wymaganych do zalogowania. Po wpisaniu poprawnych danych otworzy się właściwa aplikacja.
+
+Uwaga do aplikacji:
+Dodatkowy pusty wiersz wyświetlany przy wypisywaniu tabel to wiersz służący do wstawiania nowych danych do tabeli. Po wpisaniu w ten wiersz wszystkich wymaganych danych możemy kliknąć przycisk "Wstaw wiersz" co spowoduje wstawienie tych danych do bazy.
