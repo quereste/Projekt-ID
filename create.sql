@@ -31,8 +31,8 @@ insert into marki (id_marka, nazwa, nazwa_koncernu) values
 drop table if exists modele cascade;
 CREATE TABLE modele
 (
-	id_marka numeric(4) REFERENCES marki NOT NULL,
 	id_model numeric(8) PRIMARY KEY,
+	id_marka numeric(4) REFERENCES marki NOT NULL,
 	model varchar(50) NOT NULL,
 	masa_min numeric(6),
 	zbiornik_paliwa numeric(3),
