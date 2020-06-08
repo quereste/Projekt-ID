@@ -21,14 +21,6 @@ import java.math.BigDecimal;
 public class Hello extends JFrame {
     public Hello(String name) {
         super(name);
-        try {
-            Class.forName("org.postgresql.Driver");
-            connection= DriverManager.getConnection
-                    // ("jdbc:postgresql://db.tcs.uj.edu.pl/z11...", "z11...", "haslo");
-                            ("jdbc:postgresql://db.tcs.uj.edu.pl/z1165952", "z1165952", "xHJaKo9E9ddu");
-            statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_UPDATABLE);
-        }
-        catch(SQLException | ClassNotFoundException err){System.out.println("ERROR");}
     }
 
     private JButton buttonOne;
@@ -54,6 +46,52 @@ public class Hello extends JFrame {
      * @param args
      */
     public static void main(String[] args){
+        /*
+        String adres = JOptionPane.showInputDialog(null, "Enter printer name:");
+        String login = JOptionPane.showInputDialog(null, "Enter printer name:");
+        String haslo = JOptionPane.showInputDialog(null, "Enter printer name:");
+        System.out.println(adres+" "+login+" "+haslo);
+*/
+
+        JTextField adres = new JTextField(40);
+        JTextField login = new JTextField(10);
+        JTextField haslo = new JTextField(15);
+
+        JPanel jPanel = new JPanel();
+        jPanel.add(new JLabel("host:"));
+        jPanel.add(adres);
+        jPanel.add(Box.createVerticalStrut(15)); //odstep
+        jPanel.add(new JLabel("login:"));
+        jPanel.add(login);
+        jPanel.add(Box.createHorizontalStrut(15)); //odstep
+        jPanel.add(new JLabel("hasło:"));
+        jPanel.add(haslo);
+
+        boolean brak=true;
+
+        while(brak) {
+            int result = JOptionPane.showConfirmDialog(null, jPanel,
+                    "Podaj login i hasło do bazy danych", JOptionPane.DEFAULT_OPTION);
+            if (result == JOptionPane.OK_OPTION) {
+                System.out.println(adres.getText());
+                System.out.println(login.getText());
+                System.out.println(haslo.getText());
+                try {
+                    Class.forName("org.postgresql.Driver");
+                    connection = DriverManager.getConnection
+                            // ("jdbc:postgresql://db.tcs.uj.edu.pl/z11...", "z11...", "haslo");
+                                    (adres.getText(), login.getText(), haslo.getText());
+                    statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                    brak=false;
+                } catch (SQLException | ClassNotFoundException err) {
+                    JOptionPane.showMessageDialog(null, "Błędne dane. Kliknij OK i spróbuj ponownie","", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+            else if (result == JOptionPane.CLOSED_OPTION) {
+                System.exit(0);
+            }
+        }
+
         javax.swing.SwingUtilities.invokeLater(new Hello("GUI Baza danych")::createAndShowGUI);
     }
 
