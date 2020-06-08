@@ -413,24 +413,99 @@ public class Hello extends JFrame {
         buttonRemove.addActionListener(new ActionListener()
         {
             public void actionPerformed(ActionEvent e) {
-                boolean wypisz=true;
-                if(jTable.getSelectedRow()+1!=0) {
+             //   boolean wypisz=true;
+                int zazn;
+                zazn=jTable.convertRowIndexToModel( jTable.getSelectedRow());
+
+            //    DefaultTableModel dm = (DefaultTableModel)tableModel;
+          //      dm.fireTableDataChanged();
+                // tableModel.fireTableDataChanged();
+
+                //delete=(String) tableModel.getValueAt(jTable.getSelectedRow(),0);
+                System.out.println(tableModel.getValueAt(jTable.getSelectedRow(),0));
+                System.out.println(tableModel.getValueAt(zazn,0));
+
                     //usuwanie odbywa sie tylko w przypadku potwierdzenia
                     int response = JOptionPane.showConfirmDialog(null, "Czy napewno chcesz usunąć zaznaczony wiersz?", "Potwierdzenie usunięcia",
                             JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                     if (response == JOptionPane.YES_OPTION) {
-                        try {
-                            resultSet.absolute(jTable.getSelectedRow() + 1);
-                            resultSet.deleteRow();
-                        } catch (SQLException ex) {
-                            wypisz = false;
-                            //nazwa wyjatku
-                            String nazwa = ex.getClass().getSimpleName();
-                            //opis wyjatku
-                            String opis = ex.getMessage();
-                            JOptionPane.showMessageDialog(null, "ERROR: Nie można dokonać operacji usunięcia \n" +
-                                    "\n" + nazwa + "\n" + opis, "", JOptionPane.ERROR_MESSAGE);
+                        if (str == "samochody") {
+                            String delete;
+                            delete=(String) tableModel.getValueAt(zazn,0);
+                            String id = "vin";
+                            try {
+                                statement.execute("delete from " + str + " where " + id + "='" + delete+"'");
+                                resultSet = statement.executeQuery("select * from " + str + " order by 1");
+                                wypisz();
+                            } catch (SQLException ex) {
+                                ex.printStackTrace();
+                                String nazwa = ex.getClass().getSimpleName();
+                                String opis = ex.getMessage();
+                                JOptionPane.showMessageDialog(null, "ERROR: Nie można dokonać operacji usunięcia \n" +
+                                        "\n" + nazwa + "\n" + opis, "", JOptionPane.ERROR_MESSAGE);
+                            }
                         }
+                        else {
+                            BigDecimal delete;
+                            delete=(BigDecimal) tableModel.getValueAt(zazn,0);
+                            String id = "";
+                            switch (str) {
+                                case "historia_transakcji":
+                                    id = "id_transakcji";
+                                    break;
+                                case "doradcy":
+                                    id = "id_doradcy";
+                                    break;
+                                case "kierwonicy":
+                                    id = "id_kierownika";
+                                    break;
+                                case "salon":
+                                    id = "id_salon";
+                                    break;
+                                case "klienci_salonu":
+                                    id = "id_klienta";
+                                    break;
+                                case "typ":
+                                    id = "id_typ";
+                                    break;
+
+                                case "kraje":
+                                    id = "id_kraju";
+                                    break;
+                                case "marki":
+                                    id = "id_marka";
+                                    break;
+                                case "wyposazenie":
+                                    id = "id_wyposazenie";
+                                    break;
+                                case "modele":
+                                    id = "id_model";
+                                    break;
+                                case "rodzaj_napedu":
+                                    id = "id_naped";
+                                    break;
+                            }
+
+
+                            try {
+                                statement.execute("delete from " + str + " where " + id + "=" + delete);
+                                resultSet = statement.executeQuery("select * from " + str + " order by 1");
+                                wypisz();
+
+                                //  resultSet.absolute(jTable.getSelectedRow() + 1);
+                                //  resultSet.deleteRow();
+                            } catch (SQLException ex) {
+                                ex.printStackTrace();
+                                //  wypisz = false;
+                                //nazwa wyjatku
+                                String nazwa = ex.getClass().getSimpleName();
+                                //opis wyjatku
+                                String opis = ex.getMessage();
+                                JOptionPane.showMessageDialog(null, "ERROR: Nie można dokonać operacji usunięcia \n" +
+                                        "\n" + nazwa + "\n" + opis, "", JOptionPane.ERROR_MESSAGE);
+                            }
+                        }
+                        /*
                         if (wypisz) {
                             //wypisuje uaktualniona tabele
                             editable = true;
@@ -449,7 +524,8 @@ public class Hello extends JFrame {
                                 //    ex.printStackTrace();
                             }
                         }
-                    }
+                        */
+
                 }
             }
         });
