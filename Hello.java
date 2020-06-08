@@ -447,8 +447,10 @@ public class Hello extends JFrame {
                         }
                         else {
                             BigDecimal delete;
+                            BigDecimal delete2=new BigDecimal("0");
                             delete=(BigDecimal) tableModel.getValueAt(zazn,0);
                             String id = "";
+                            String id2 = "";
                             switch (str) {
                                 case "historia_transakcji":
                                     id = "id_transakcji";
@@ -481,51 +483,58 @@ public class Hello extends JFrame {
                                 case "modele":
                                     id = "id_model";
                                     break;
-                                case "rodzaj_napedu":
+                                case "modele_kraje":
+                                    id = "id_model";
+                                    id2 = "id_kraju";
+                                    delete2=(BigDecimal) tableModel.getValueAt(zazn,1);
+                                    break;
+                                case "modele_wyposazenie":
+                                    id = "id_wyposazenie";
+                                    id2 = "id_model";
+                                    delete2=(BigDecimal) tableModel.getValueAt(zazn,1);
+                                    break;
+                                case "modele_naped":
                                     id = "id_naped";
+                                    id2 = "id_model";
+                                    delete2=(BigDecimal) tableModel.getValueAt(zazn,1);
+                                    break;
+                                case "modele_typ":
+                                    id = "id_typ";
+                                    id2 = "id_model";
+                                    delete2=(BigDecimal) tableModel.getValueAt(zazn,1);
                                     break;
                             }
 
-
-                            try {
-                                statement.execute("delete from " + str + " where " + id + "=" + delete);
-                                resultSet = statement.executeQuery("select * from " + str + " order by 1");
-                                wypisz();
-
-                                //  resultSet.absolute(jTable.getSelectedRow() + 1);
-                                //  resultSet.deleteRow();
-                            } catch (SQLException ex) {
-                                ex.printStackTrace();
-                                //  wypisz = false;
-                                //nazwa wyjatku
-                                String nazwa = ex.getClass().getSimpleName();
-                                //opis wyjatku
-                                String opis = ex.getMessage();
-                                JOptionPane.showMessageDialog(null, "ERROR: Nie można dokonać operacji usunięcia \n" +
-                                        "\n" + nazwa + "\n" + opis, "", JOptionPane.ERROR_MESSAGE);
+                            if(str!="modele_kraje"&&str!="modele_wyposazenie"&&str!="modele_naped"&&str!="modele_typ") {
+                                try {
+                                    System.out.println(delete+" "+delete2);
+                                    statement.execute("delete from " + str + " where " + id + "=" + delete);
+                                    resultSet = statement.executeQuery("select * from " + str + " order by 1");
+                                    wypisz();
+                                } catch (SQLException ex) {
+                                    ex.printStackTrace();
+                                    String nazwa = ex.getClass().getSimpleName();
+                                    String opis = ex.getMessage();
+                                    JOptionPane.showMessageDialog(null, "ERROR: Nie można dokonać operacji usunięcia \n" +
+                                            "\n" + nazwa + "\n" + opis, "", JOptionPane.ERROR_MESSAGE);
+                                }
                             }
+                            else{
+                                try {
+                                    statement.execute("delete from " + str + " where " + id + "=" + delete+" and "+id2+"="+delete2);
+                                    resultSet = statement.executeQuery("select * from " + str + " order by 1");
+                                    wypisz();
+                                } catch (SQLException ex) {
+                                    ex.printStackTrace();
+                                    String nazwa = ex.getClass().getSimpleName();
+                                    String opis = ex.getMessage();
+                                    JOptionPane.showMessageDialog(null, "ERROR: Nie można dokonać operacji usunięcia \n" +
+                                            "\n" + nazwa + "\n" + opis, "", JOptionPane.ERROR_MESSAGE);
+                                }
+                            }
+
+
                         }
-                        /*
-                        if (wypisz) {
-                            //wypisuje uaktualniona tabele
-                            editable = true;
-                            str = "";
-                            str = text.getText();
-                            //jezeli nic nie jest wpisane wtedy pobieramy nazwe z okienka wyboru
-                            if (str.equals("")) {
-                                str = (String) tabele.getSelectedItem();
-                            }
-                            try {
-                                resultSet = statement.executeQuery("select * from " + str + " order by 1");
-                                wypisz();
-                                //   resultSet = statement.executeQuery("select m.nazwa, model,silnik,nowy,kolor,w.nazwa,n.nazwa,rok_produkcji as \"rok\",cena,t.nazwa,skrzynia_biegow from samochody left outer join modele using(id_model) left outer join marki m using(id_marka) left outer join wyposazenie w using(id_wyposazenie) left outer join rodzaj_napedu n using(id_naped) left outer join typ t using(id_typ);");
-                            } catch (SQLException ex) {
-                                JOptionPane.showMessageDialog(null, "ERROR: Nie istnieje tabela o podanej nazwie: " + str, "", JOptionPane.ERROR_MESSAGE);
-                                //    ex.printStackTrace();
-                            }
-                        }
-                        */
-
                 }
             }
         });
