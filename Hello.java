@@ -233,12 +233,6 @@ public class Hello extends JFrame {
                                     "\n" + nazwa + "\n" + opis, "", JOptionPane.ERROR_MESSAGE);
                             //ponowne wypisanie starergo stanu
                             editable = true;
-                            str = "";
-                            str = text.getText();
-                            //jezeli nic nie jest wpisane wtedy pobieramy nazwe z okienka wyboru
-                            if (str.equals("")) {
-                                str = (String) tabele.getSelectedItem();
-                            }
                             try {
                                 resultSet = statement.executeQuery("select * from " + str + " order by 1");
                                 wypisz();
@@ -260,12 +254,6 @@ public class Hello extends JFrame {
                             JOptionPane.showMessageDialog(null, "ERROR: Nie można dokonać operacji uaktualnienia \n" +
                                     "\n" + "Godzina jest prawdopodobnie w złym formacie \n" + "\n" + nazwa + "\n" + opis, "", JOptionPane.ERROR_MESSAGE);
                             editable = true;
-                            str = "";
-                            str = text.getText();
-                            //jezeli nic nie jest wpisane wtedy pobieramy nazwe z okienka wyboru
-                            if (str.equals("")) {
-                                str = (String) tabele.getSelectedItem();
-                            }
                             try {
                                 resultSet = statement.executeQuery("select * from " + str + " order by 1");
                                 wypisz();
@@ -283,12 +271,6 @@ public class Hello extends JFrame {
                         JOptionPane.showMessageDialog(null, "ERROR: Nie można dokonać operacji uaktualnienia \n" +
                                 "\n" +"Data jest prawdopodobnie w złym formacie \n"+"\n"+ nazwa + "\n" + opis, "", JOptionPane.ERROR_MESSAGE);
                         editable = true;
-                        str = "";
-                        str = text.getText();
-                        //jezeli nic nie jest wpisane wtedy pobieramy nazwe z okienka wyboru
-                        if (str.equals("")) {
-                            str = (String) tabele.getSelectedItem();
-                        }
                         try {
                             resultSet = statement.executeQuery("select * from " + str + " order by 1");
                             wypisz();
@@ -353,7 +335,7 @@ public class Hello extends JFrame {
         button4.addActionListener(e -> {
                     editable=false;
                     try {
-                        resultSet = statement.executeQuery("select m.nazwa, model,silnik,nowy,kolor,w.nazwa,n.nazwa,rok_produkcji as \"rok\",cena,t.nazwa,skrzynia_biegow from samochody left outer join modele using(id_model) left outer join marki m using(id_marka) left outer join wyposazenie w using(id_wyposazenie) left outer join rodzaj_napedu n using(id_naped) left outer join typ t using(id_typ);");
+                        resultSet = statement.executeQuery("select m.nazwa as \"marka\", model,silnik,nowy,kolor,w.nazwa as \"wyposażenie\",n.nazwa as \"napęd\",rok_produkcji as \"rok\",cena,t.nazwa as \"typ\",skrzynia_biegow from samochody left outer join modele using(id_model) left outer join marki m using(id_marka) left outer join wyposazenie w using(id_wyposazenie) left outer join rodzaj_napedu n using(id_naped) left outer join typ t using(id_typ);");
                         wypisz();
                     } catch (SQLException ex){
                         ex.printStackTrace();
@@ -386,12 +368,13 @@ public class Hello extends JFrame {
         //wykonuje zapytanie, a nastepnie wyswietla wynik
         button5.addActionListener(e -> {
                     editable=false;
-                    str=text1.getText();
+                    String pol;
+                    pol=text1.getText();
                     try {
-                        resultSet = statement.executeQuery(str);
+                        resultSet = statement.executeQuery(pol);
                         wypisz();
                     } catch (SQLException ex){
-                        JOptionPane.showMessageDialog(null, "ERROR: Błędne polecenie: "+str,"",JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "ERROR: Błędne polecenie: "+pol,"",JOptionPane.ERROR_MESSAGE);
                     }
                 }
         );
@@ -533,7 +516,6 @@ public class Hello extends JFrame {
                                             "\n" + nazwa + "\n" + opis, "", JOptionPane.ERROR_MESSAGE);
                                 }
                             }
-
 
                         }
                 }
