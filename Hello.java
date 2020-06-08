@@ -42,17 +42,7 @@ public class Hello extends JFrame {
     boolean editable;
     ResultSetMetaData meta;
 
-    /**
-     * @param args
-     */
     public static void main(String[] args){
-        /*
-        String adres = JOptionPane.showInputDialog(null, "Enter printer name:");
-        String login = JOptionPane.showInputDialog(null, "Enter printer name:");
-        String haslo = JOptionPane.showInputDialog(null, "Enter printer name:");
-        System.out.println(adres+" "+login+" "+haslo);
-*/
-
         JTextField adres = new JTextField(40);
         JTextField login = new JTextField(10);
         JTextField haslo = new JTextField(15);
@@ -73,13 +63,9 @@ public class Hello extends JFrame {
             int result = JOptionPane.showConfirmDialog(null, jPanel,
                     "Podaj login i hasło do bazy danych", JOptionPane.DEFAULT_OPTION);
             if (result == JOptionPane.OK_OPTION) {
-                System.out.println(adres.getText());
-                System.out.println(login.getText());
-                System.out.println(haslo.getText());
                 try {
                     Class.forName("org.postgresql.Driver");
                     connection = DriverManager.getConnection
-                            // ("jdbc:postgresql://db.tcs.uj.edu.pl/z11...", "z11...", "haslo");
                                     (adres.getText(), login.getText(), haslo.getText());
                     statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
                     brak=false;
@@ -120,13 +106,10 @@ public class Hello extends JFrame {
                             retVal = String.class;
                         }
                     }catch(SQLException ex){
-                     //   return Object.class;
+                        return Object.class;
                     }
-                    //jezeli juz bylby return to zdarza sie ze zwroci string dla godziny i nie mozna posortowac godzin bo musza byc objectami
-             //       return retVal;
                 }
 
-//System.out.println("Pobieranie informacji  "+(col+1));
                 try {
                     //91 to kod daty, 92 to czas
                     //chcemy wypisywac jako stringi
@@ -134,7 +117,6 @@ public class Hello extends JFrame {
                     //inaczej doszloby do wyjatku spowodowanego niemoznoscia konwwersji daty/czasu do stringu
                     if (meta.getColumnType(col+1)==91||meta.getColumnType(col+1)==92) {
                         retVal = Object.class;
-               //         System.out.println("Data "+(col+1));
                     }
                 }catch(SQLException ex){return Object.class;}
 
@@ -179,7 +161,6 @@ public class Hello extends JFrame {
         tableModel.addTableModelListener(new TableModelListener() {
             public void tableChanged(TableModelEvent e) {
                 boolean godzina=false;
-                System.out.println(tableModel.getValueAt(e.getFirstRow(),e.getColumn()));
                 int liczbaWierszy=0;
 
                 try {
@@ -204,8 +185,6 @@ public class Hello extends JFrame {
                         //numeric, czyli moga wystapic po kropce cyfry
                         else {
                             if (typ == 2) {
-                           //     float zamiana = Float.parseFloat((String) tableModel.getValueAt(e.getFirstRow(), e.getColumn()));
-                            //    resultSet.updateFloat(e.getColumn() + 1, zamiana);
                                 BigDecimal zamiana = (BigDecimal) tableModel.getValueAt(e.getFirstRow(), e.getColumn());
                                 resultSet.updateBigDecimal(e.getColumn() + 1, zamiana);
 
@@ -337,9 +316,7 @@ public class Hello extends JFrame {
         //wyswietla okno na srodku
         setLocationRelativeTo(null);
 
-        buttonOne = new JButton("Wypisz");
-        buttonOne.addActionListener(e -> {System.out.println(text.getText());});
-        buttonTwo = new JButton("Wyœwietl tabelê");
+        buttonTwo = new JButton("Wyświetl tabelę");
         //wykonuje zapytanie, a nastepnie je wyswietla
         buttonTwo.addActionListener(e -> {
                     editable=true;
@@ -369,9 +346,9 @@ public class Hello extends JFrame {
             System.exit(0);
         });
 
-        lab = new JLabel("Wpisz albo wybierz nazwê tabeli któr¹ chcesz zobaczyæ: ");
+        lab = new JLabel("Wpisz albo wybierz nazwę tabeli którą chcesz zobaczyć: ");
         JLabel lab2=new JLabel("Na skróty: ");
-        JButton button4 = new JButton("Dostêpne samochody");
+        JButton button4 = new JButton("Dostępne samochody");
         //wykonuje zapytanie, a nastepnie je wyswietla
         button4.addActionListener(e -> {
                     editable=false;
@@ -414,8 +391,7 @@ public class Hello extends JFrame {
                         resultSet = statement.executeQuery(str);
                         wypisz();
                     } catch (SQLException ex){
-                        JOptionPane.showMessageDialog(null, "ERROR: B³êdne polecenie: "+str,"",JOptionPane.ERROR_MESSAGE);
-                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(null, "ERROR: Błędne polecenie: "+str,"",JOptionPane.ERROR_MESSAGE);
                     }
                 }
         );
@@ -451,17 +427,8 @@ public class Hello extends JFrame {
         buttonRemove.addActionListener(new ActionListener()
         {
             public void actionPerformed(ActionEvent e) {
-             //   boolean wypisz=true;
                 int zazn;
                 zazn=jTable.convertRowIndexToModel( jTable.getSelectedRow());
-
-            //    DefaultTableModel dm = (DefaultTableModel)tableModel;
-          //      dm.fireTableDataChanged();
-                // tableModel.fireTableDataChanged();
-
-                //delete=(String) tableModel.getValueAt(jTable.getSelectedRow(),0);
-                System.out.println(tableModel.getValueAt(jTable.getSelectedRow(),0));
-                System.out.println(tableModel.getValueAt(zazn,0));
 
                     //usuwanie odbywa sie tylko w przypadku potwierdzenia
                     int response = JOptionPane.showConfirmDialog(null, "Czy napewno chcesz usunąć zaznaczony wiersz?", "Potwierdzenie usunięcia",
@@ -476,7 +443,6 @@ public class Hello extends JFrame {
                                 resultSet = statement.executeQuery("select * from " + str + " order by 1");
                                 wypisz();
                             } catch (SQLException ex) {
-                                ex.printStackTrace();
                                 String nazwa = ex.getClass().getSimpleName();
                                 String opis = ex.getMessage();
                                 JOptionPane.showMessageDialog(null, "ERROR: Nie można dokonać operacji usunięcia \n" +
@@ -543,14 +509,12 @@ public class Hello extends JFrame {
                                     break;
                             }
 
-                            if(str!="modele_kraje"&&str!="modele_wyposazenie"&&str!="modele_naped"&&str!="modele_typ") {
+                            if(!str.equals("modele_kraje")&&!str.equals("modele_wyposazenie")&&!str.equals("modele_naped")&&!str.equals("modele_typ")) {
                                 try {
-                                    System.out.println(delete+" "+delete2);
                                     statement.execute("delete from " + str + " where " + id + "=" + delete);
                                     resultSet = statement.executeQuery("select * from " + str + " order by 1");
                                     wypisz();
                                 } catch (SQLException ex) {
-                                    ex.printStackTrace();
                                     String nazwa = ex.getClass().getSimpleName();
                                     String opis = ex.getMessage();
                                     JOptionPane.showMessageDialog(null, "ERROR: Nie można dokonać operacji usunięcia \n" +
@@ -563,7 +527,6 @@ public class Hello extends JFrame {
                                     resultSet = statement.executeQuery("select * from " + str + " order by 1");
                                     wypisz();
                                 } catch (SQLException ex) {
-                                    ex.printStackTrace();
                                     String nazwa = ex.getClass().getSimpleName();
                                     String opis = ex.getMessage();
                                     JOptionPane.showMessageDialog(null, "ERROR: Nie można dokonać operacji usunięcia \n" +
@@ -594,7 +557,6 @@ public class Hello extends JFrame {
                     int szerokosc=meta.getColumnCount();
                     while(i<szerokosc) {
                         i++;
-                        System.out.println("numer kolumny: " +i);
                         int typ = meta.getColumnType(i);
                         //integer (w bazie nie wystepuje, wszsytkie liczby pamietane sa jako numeric)
                         if (typ == 4) {
@@ -607,9 +569,6 @@ public class Hello extends JFrame {
                             if (typ == 2) {
                                 BigDecimal zamiana = (BigDecimal) tableModel.getValueAt(liczbaWierszy,i-1);
                                 resultSet.updateBigDecimal(i, zamiana);
-
-                            //    float zamiana = Float.parseFloat((String) tableModel.getValueAt(liczbaWierszy,i-1));
-                           //     resultSet.updateFloat(i, zamiana);
                             }
                             //varchar||char
                             else {
@@ -632,9 +591,6 @@ public class Hello extends JFrame {
                                         }
                                         //zaden z powyzszych typow
                                         else {
-                                           // Object zamiana =tableModel.getValueAt(liczbaWierszy,i-1);
-                                          //  resultSet.updateObject(i, zamiana);
-                                          //  System.out.println("Object");
                                             JOptionPane.showMessageDialog(null, "Błąd wewnętrzny bazy","", JOptionPane.ERROR_MESSAGE);
                                         }
                                         }
@@ -643,7 +599,6 @@ public class Hello extends JFrame {
                         }
                     }
                     resultSet.insertRow();
-
                     //wypisuje zaktualizowana tabele
                     editable=true;
                     try {
@@ -674,23 +629,22 @@ public class Hello extends JFrame {
                     //opis wyjatku
                     String opis = exc.getMessage();
                     JOptionPane.showMessageDialog(null, "ERROR: Nie można dokonać operacji wstawienia \n" +
-                            "\n"+"Sprawdz czy wartość w kolumnie "+nazwaCol+" jest odpowiedniego typu \n"+"\n" + nazwa + "\n" + opis, "", JOptionPane.ERROR_MESSAGE);
+                            "\n"+"Sprawdź czy wartość w kolumnie "+nazwaCol+" jest odpowiedniego typu \n"+"\n" + nazwa + "\n" + opis, "", JOptionPane.ERROR_MESSAGE);
                 }catch(ParseException excep){
                     String nazwa = excep.getClass().getSimpleName();
                     //opis wyjatku
                     String opis = excep.getMessage();
                     JOptionPane.showMessageDialog(null, "ERROR: Nie można dokonać operacji wstawienia \n" +
-                            "\n"+"Sprawdz czy godzina jest w dobrym formacie \n"+"\n" + nazwa + "\n" + opis, "", JOptionPane.ERROR_MESSAGE);
+                            "\n"+"Sprawdź czy godzina jest w dobrym formacie \n"+"\n" + nazwa + "\n" + opis, "", JOptionPane.ERROR_MESSAGE);
                 }catch(IllegalArgumentException except){
                     String nazwa = except.getClass().getSimpleName();
                     //opis wyjatku
                     String opis = except.getMessage();
                     JOptionPane.showMessageDialog(null, "ERROR: Nie można dokonać operacji wstawienia \n" +
-                            "\n"+"Sprawdz czy data jest w dobrym formacie \n"+"\n" + nazwa + "\n" + opis, "", JOptionPane.ERROR_MESSAGE);
+                            "\n"+"Sprawdź czy data jest w dobrym formacie \n"+"\n" + nazwa + "\n" + opis, "", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
-
 
         //    add(buttonOne);
         //   add(buttonTwo);
