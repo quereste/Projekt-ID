@@ -164,21 +164,6 @@ CREATE TABLE modele_wyposazenie
 	PRIMARY KEY (id_wyposazenie,id_model)
 );
 
-insert into modele_wyposazenie(id_model,id_wyposazenie) values 
-(1,1),(1,2),(1,3),(1,4),(1,5),
-(2,1),(2,2),(2,3),(2,4),
-(3,1),(3,2),(3,3),(3,4),
-(4,1),
-(5,1),
-(6,6),(6,7),(6,8),
-(9,9),(9,10),(9,11),(9,12),
-(10,14),(10,15),(10,16),(10,13),
-(11,17),(11,16),(11,15),(11,13),
-(14,1),
-(15,19),(15,8),(15,18)
-;
-
-
 drop table if exists rodzaj_napedu cascade;
 CREATE TABLE rodzaj_napedu
 (
@@ -525,6 +510,21 @@ BEGIN
 END;
 $telefon_ins$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION model_wyposazenie() RETURNS trigger AS $model_wyposazenie$
+BEGIN 
+	IF (select count(*) from modele left outer join modele_wyposazenie
+	using(id_model) where id_model=NEW.id_model AND id_marka NOT IN(
+		SELECT w.id_marka
+		FROM wyposazenie w
+		WHERE w.id_marka IS NOT NULL AND w.id_wyposazenie=NEW.id_wyposazenie
+		)
+	)>0 then
+		raise exception 'wyposazenie innej marki';
+	ELSE return new;	
+	END IF;
+END;
+$model_wyposazenie$ LANGUAGE plpgsql;
+
 CREATE TRIGGER telefon_uni BEFORE UPDATE ON kierownicy
 FOR EACH ROW EXECUTE PROCEDURE telefon_uni();
 CREATE TRIGGER telefon_ins BEFORE INSERT ON kierownicy
@@ -549,7 +549,26 @@ CREATE TRIGGER samochod_wyposazenie BEFORE INSERT ON samochody
 FOR EACH ROW EXECUTE PROCEDURE samochod_wyposazenie();
 CREATE TRIGGER samochod_wyposazeniu BEFORE UPDATE ON samochody
 FOR EACH ROW EXECUTE PROCEDURE samochod_wyposazenie();
-			   
+
+CREATE TRIGGER model_wyposazenie BEFORE INSERT ON modele_wyposazenie
+FOR EACH ROW EXECUTE PROCEDURE model_wyposazenie();
+CREATE TRIGGER model_wyposazeni BEFORE UPDATE ON modele_wyposazenie
+FOR EACH ROW EXECUTE PROCEDURE model_wyposazenie();
+	
+insert into modele_wyposazenie(id_model,id_wyposazenie) values 
+(1,1),(1,2),(1,3),(1,4),(1,5),
+(2,1),(2,2),(2,3),(2,4),
+(3,1),(3,2),(3,3),(3,4),
+(4,1),
+(5,1),
+(6,6),(6,7),(6,8),
+(9,9),(9,10),(9,11),(9,12),
+(10,14),(10,15),(10,16),(10,13),
+(11,17),(11,16),(11,15),(11,13),
+(14,1),
+(15,19),(15,8),(15,18)
+;
+		   
 insert into kierownicy(id_kierownika, imie, nazwisko, telefon) values
 (10, 'Marcel', 'Buda', '293819292'),
 (11, 'Mira', 'Len', '218398293'),
@@ -791,5 +810,4 @@ insert into historia_transakcji(id_transakcji, id_salon, id_modelu, data_transak
 (23, 2, 3, '2019-09-27', 41000, 'TAK', 11, NULL),
 (24, 6, 10, '2019-10-01', 17200, 'NIE', 27, NULL),
 (25, 6, 7, '2019-10-03', 3500, 'NIE', 29, NULL)
-	;
-
+;
