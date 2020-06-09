@@ -472,6 +472,7 @@ BEGIN
   RETURN NEW;
 END;
 $samochod_data$ LANGUAGE plpgsql;
+				 
 CREATE OR REPLACE FUNCTION samochod_naped() RETURNS trigger AS $samochod_naped$
 BEGIN        	
 	IF (new.id_naped IN (SELECT id_naped from modele_naped a join modele b on a.id_model = b.id_model where a.id_model = new.id_model)) then
@@ -479,7 +480,17 @@ BEGIN
 	END IF;	
 	RAISE exception 'Naped niestosowany we wskazanym modelu';
 END;
-$samochod_naped$ LANGUAGE plpgsql;			 
+$samochod_naped$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION samochod_typ() RETURNS trigger AS $samochod_typ$
+BEGIN        	
+	IF (new.id_typ IN (SELECT id_typ from modele_typ a join modele b on a.id_model = b.id_model where a.id_model = new.id_model)) then
+  		RETURN NEW;
+	END IF;	
+	RAISE exception 'Typ nieistniejacy we wskazanym modelu';
+END;
+$samochod_typ$ LANGUAGE plpgsql;
+			     
 CREATE OR REPLACE FUNCTION telefon_ins() RETURNS trigger AS $telefon_ins$
 BEGIN
         IF (Select count(*) from klienci_salonu where telefon=NEW.telefon)>0 then
@@ -505,14 +516,22 @@ CREATE TRIGGER telefon_uni BEFORE UPDATE ON kierownicy
 FOR EACH ROW EXECUTE PROCEDURE telefon_uni();
 CREATE TRIGGER telefon_ins BEFORE INSERT ON kierownicy
 FOR EACH ROW EXECUTE PROCEDURE telefonC_ins();
+			   
 CREATE TRIGGER samochod_data BEFORE INSERT ON samochody
 FOR EACH ROW EXECUTE PROCEDURE samochod_data();
 CREATE TRIGGER samochod_datu BEFORE UPDATE ON samochody
 FOR EACH ROW EXECUTE PROCEDURE samochod_data();
+			   
 CREATE TRIGGER samochod_naped BEFORE INSERT ON samochody
 FOR EACH ROW EXECUTE PROCEDURE samochod_naped();
 CREATE TRIGGER samochod_napeu BEFORE UPDATE ON samochody
 FOR EACH ROW EXECUTE PROCEDURE samochod_naped();
+
+CREATE TRIGGER samochod_typ BEFORE INSERT ON samochody
+FOR EACH ROW EXECUTE PROCEDURE samochod_typ();
+CREATE TRIGGER samochod_tyu BEFORE UPDATE ON samochody
+FOR EACH ROW EXECUTE PROCEDURE samochod_typ();
+			   
 insert into kierownicy(id_kierownika, imie, nazwisko, telefon) values
 (10, 'Marcel', 'Buda', '293819292'),
 (11, 'Mira', 'Len', '218398293'),
