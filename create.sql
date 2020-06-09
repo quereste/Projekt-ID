@@ -490,6 +490,19 @@ BEGIN
 	RAISE exception 'Typ nieistniejacy we wskazanym modelu';
 END;
 $samochod_typ$ LANGUAGE plpgsql;
+			   
+CREATE OR REPLACE FUNCTION samochod_wyposazenie() RETURNS trigger AS $samochod_wyposazenie$
+BEGIN   
+	IF new.id_wyposazenie IS NULL then return new; end if;
+	IF ((SELECT a.id_marka from modele a where a.id_model = new.id_model) = (select a.id_marka from wyposazenie  a where a.id_wyposazenie = new.id_wyposazenie)) then
+		IF (new.id_wyposazenie IN (SELECT id_wyposazenie from modele_wyposazenie a where a.id_model = new.id_model)) then
+  		RETURN NEW;
+	END IF;	
+	END if;
+	raise exception 'wyposazenie innej marki';								 
+										 
+END;
+$samochod_wyposazenie$ LANGUAGE plpgsql;
 			     
 CREATE OR REPLACE FUNCTION telefon_ins() RETURNS trigger AS $telefon_ins$
 BEGIN
@@ -531,6 +544,11 @@ CREATE TRIGGER samochod_typ BEFORE INSERT ON samochody
 FOR EACH ROW EXECUTE PROCEDURE samochod_typ();
 CREATE TRIGGER samochod_tyu BEFORE UPDATE ON samochody
 FOR EACH ROW EXECUTE PROCEDURE samochod_typ();
+
+CREATE TRIGGER samochod_wyposazenie BEFORE INSERT ON samochody
+FOR EACH ROW EXECUTE PROCEDURE samochod_wyposazenie();
+CREATE TRIGGER samochod_wyposazeniu BEFORE UPDATE ON samochody
+FOR EACH ROW EXECUTE PROCEDURE samochod_wyposazenie();
 			   
 insert into kierownicy(id_kierownika, imie, nazwisko, telefon) values
 (10, 'Marcel', 'Buda', '293819292'),
@@ -743,7 +761,7 @@ silnik_moc_KM,predkosc_max,id_typ) values
 insert into samochody (id_salon, id_model,vin,cena,nowy,liczba_drzwi,kolor,id_wyposazenie,
 rok_produkcji,liczba_miejsc,id_naped,silnik,spalanie,silnik_moc_kW,
 silnik_moc_KM,predkosc_max,id_typ,przyspieszenie) values 
-(1, 15,'WBAHD5313MBF95736',159000,'TAK',4,'niebieski',14,2020,4,1,'elektryczny',0,125,170,150,3,7.3),
+(1, 15,'WBAHD5313MBF95736',159000,'TAK',4,'niebieski',19,2020,4,1,'elektryczny',0,125,170,150,3,7.3),
 (1, 15,'JH4DA3360JS015375',617136,'TAK',4,'bialy',8,2020,4,1,'elektryczny',0,460,625,260,3,3.2)
 ;
 
