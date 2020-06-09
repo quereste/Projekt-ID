@@ -461,6 +461,17 @@ BEGIN
 END;
 $telefon_uni$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION samochod_data() RETURNS trigger AS $samochod_data$
+BEGIN        	
+	IF (new.rok_produkcji < (SELECT a.poczatek_produkcji from modele a where a.id_model = new.id_model)) then
+	    	RAISE exception 'Ten samochod nie byl produkowany w podanym roku';
+	END IF;
+        IF (new.rok_produkcji > (SELECT a.koniec_produkcji from modele a where a.id_model = new.id_model)) then
+	    	RAISE exception 'Ten samochod nie byl produkowany w podanym roku';
+	END IF;
+  RETURN NEW;
+END;
+$samochod_data$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION telefon_ins() RETURNS trigger AS $telefon_ins$
 BEGIN
         IF (Select count(*) from klienci_salonu where telefon=NEW.telefon)>0 then
@@ -485,7 +496,9 @@ $telefon_ins$ LANGUAGE plpgsql;
 CREATE TRIGGER telefon_uni BEFORE UPDATE ON kierownicy
 FOR EACH ROW EXECUTE PROCEDURE telefon_uni();
 CREATE TRIGGER telefon_ins BEFORE INSERT ON kierownicy
-FOR EACH ROW EXECUTE PROCEDURE telefon_ins();
+FOR EACH ROW EXECUTE PROCEDURE telefonC_ins();
+CREATE TRIGGER samochod_data BEFORE INSERT ON samochody
+FOR EACH ROW EXECUTE PROCEDURE samochod_data();
 
 insert into kierownicy(id_kierownika, imie, nazwisko, telefon) values
 (10, 'Marcel', 'Buda', '293819292'),
