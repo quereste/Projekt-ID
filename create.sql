@@ -708,22 +708,22 @@ silnik_moc_KM,predkosc_max,id_typ,przyspieszenie, id_klienta, przebieg, bezwypad
 (2, 3, '1FUJA6CV74DM34063', 27000, 'NIE', 5, 'czarny', 3, 2017, 5, 1, 'diesel', 5.4, 'automatyczna', 8, 190, 212, 1, 8.0, 7, 70000, 'NIE'),
 (1, 3, '5N3ZA0NE6AN906847', 45300, 'NIE', 5, 'pomaranczowy', 4, 2018, 5, 1,'benzyna', 8.6, 'manualna', 6, 360, 250, 1, 4.9, 9, 39000, 'TAK'),
 (5, 4, '4A3AB76T68E011282', 22900, 'NIE', 5, 'srebrny', 1, 2006, 5, 1, 'benzyna', 9.0, 'automatyczna', 5, 231, 202, 1, 8.5, 27, 98000, 'TAK'),
-(5, 4, '1N4BA41E74C829102', 17800, 'NIE', 5, 'blekitny', 1, 2002, 5, 1, 'diesel', 6.6, 'manualna', 6, 184, 200, 1, 10.1, 26, 112000, 'TAK'),
+(5, 4, '1N4BA41E74C829102', 17800, 'NIE', 5, 'blekitny', 1, 2007, 5, 1, 'diesel', 6.6, 'manualna', 6, 184, 200, 1, 10.1, 26, 112000, 'TAK'),
 (2, 5, '1GMDX03E8VD266902', 23000, 'NIE', 5, 'szary', 1, 2008, 5, 1, 'benzyna', 11.0, 'manualna', 6, 306, 240, 1, 6.7, 36, 97000, 'TAK'),
 (2, 5, '1GBJ7D1B4BV132373', 17000, 'NIE', 5, 'szary', 1, 2008, 5, 1, 'benzyna', 11.0, 'manualna', 6, 306, 240, 1, 6.7, 36, 94300, 'NIE'),
 (2, 5, 'YV1672MK9D2304784', 18500, 'NIE', 5, 'szary', 1, 2008, 5, 1, 'benzyna', 11.0, 'manualna', 6, 306, 240, 1, 6.7, 36, 102500, 'TAK'),
 (2, 5, 'JH4KA4630LC007479', 16900, 'NIE', 5, 'szary', 1, 2008, 5, 1, 'benzyna', 11.0, 'manualna', 6, 306, 240, 1, 6.7, 36, 82300, 'NIE'),
-(6, 7, '1FV3GFBC0YHA74039', 4300, 'NIE', 5, 'granatowy', NULL, 1998, 5,  2, 'benzyna', 8.1, 'automatyczna', 4,  75, 170, 4, 13.2, 29,  143900, 'TAK'),
-(1, 7, 'SCBLC37F85CX10207', 3900, 'NIE', 5, 'karmazynowy', NULL, 1997, 5, 2, 'benzyna', 8.1, 'manualna', 5, 71, 170, 4, 13.3, 28, 162000, 'TAK'),
-(2, 7, 'JHMFA16586S014014', 2300, 'NIE', 5, 'czarny', NULL, 1996, 5, 2, 'diesel', 5.4, 'automatyczna', 4,  68, 165, 4, 16.5, 7, 173000, 'NIE')
+(6, 7, '1FV3GFBC0YHA74039', 4300, 'NIE', 5, 'granatowy', NULL, 2005, 5,  2, 'benzyna', 8.1, 'automatyczna', 4,  75, 170, 4, 13.2, 29,  143900, 'TAK'),
+(1, 7, 'SCBLC37F85CX10207', 3900, 'NIE', 5, 'karmazynowy', NULL, 2005, 5, 2, 'benzyna', 8.1, 'manualna', 5, 71, 170, 4, 13.3, 28, 162000, 'TAK'),
+(2, 7, 'JHMFA16586S014014', 2300, 'NIE', 5, 'czarny', NULL, 2006, 5, 2, 'diesel', 5.4, 'automatyczna', 4,  68, 165, 4, 16.5, 7, 173000, 'NIE')
 ;
 
 insert into samochody(id_salon, id_model, vin ,cena,nowy,liczba_drzwi,kolor,id_wyposazenie,
 rok_produkcji,liczba_miejsc,id_naped,silnik,spalanie,skrzynia_biegow,liczba_biegow,
 silnik_moc_KM,predkosc_max,id_typ,przyspieszenie) values 
 (1,1,'WDCGG8HB0AF462890',159100,'TAK',5,'niebieski',1,2018,5,2,'benzyna',5.9,'manualna',6,192,225,2,7.7),
-(1, 1, 'WP1AB29P99LA40680', 143900, 'TAK', 5, 'srebrny', 2, 2012, 5, 1, 'benzyna', 7.2, 'automatyczna', 8, 245,240, 2, 6.4),
-(1, 1, '2C3CCAET4CH256062', 162100, 'TAK', 5, 'czarny', 5, 2016, 5, 3, 'diesel', 5.2, 'automatyczna', 8, 116, 189, 2, 11.3),
+(1, 1, 'WP1AB29P99LA40680', 143900, 'TAK', 5, 'srebrny', 2, 2016, 5, 1, 'benzyna', 7.2, 'automatyczna', 8, 245,240, 2, 6.4),
+(1, 1, '2C3CCAET4CH256062', 162100, 'TAK', 5, 'czarny', 5, 2016, 5, 2, 'diesel', 5.2, 'automatyczna', 8, 116, 189, 2, 11.3),
 (1, 6,'1J4GZ58S9VC710649',543540,'TAK',5,'niebieski',7,2019,4,3,'diesel',6.8,'automatyczna',8,422,285,5,4.5)
 ;
 
@@ -743,7 +743,7 @@ silnik_moc_KM,predkosc_max,id_typ) values
 insert into samochody (id_salon, id_model,vin,cena,nowy,liczba_drzwi,kolor,id_wyposazenie,
 rok_produkcji,liczba_miejsc,id_naped,silnik,spalanie,silnik_moc_kW,
 silnik_moc_KM,predkosc_max,id_typ,przyspieszenie) values 
-(1, 14,'WBAHD5313MBF95736',159000,'TAK',4,'niebieski',14,2020,4,3,'elektryczny',0,125,170,150,6,7.3),
+(1, 15,'WBAHD5313MBF95736',159000,'TAK',4,'niebieski',14,2020,4,1,'elektryczny',0,125,170,150,3,7.3),
 (1, 15,'JH4DA3360JS015375',617136,'TAK',4,'bialy',8,2020,4,1,'elektryczny',0,460,625,260,3,3.2)
 ;
 
