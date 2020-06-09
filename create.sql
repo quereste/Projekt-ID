@@ -515,7 +515,7 @@ $telefon_ins$ LANGUAGE plpgsql;
 CREATE TRIGGER telefon_uni BEFORE UPDATE ON kierownicy
 FOR EACH ROW EXECUTE PROCEDURE telefon_uni();
 CREATE TRIGGER telefon_ins BEFORE INSERT ON kierownicy
-FOR EACH ROW EXECUTE PROCEDURE telefonC_ins();
+FOR EACH ROW EXECUTE PROCEDURE telefon_ins();
 			   
 CREATE TRIGGER samochod_data BEFORE INSERT ON samochody
 FOR EACH ROW EXECUTE PROCEDURE samochod_data();
