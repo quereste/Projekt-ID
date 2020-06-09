@@ -71,6 +71,7 @@ public class Hello extends JFrame {
                     brak=false;
                 } catch (SQLException | ClassNotFoundException err) {
                     JOptionPane.showMessageDialog(null, "Błędne dane. Kliknij OK i spróbuj ponownie","", JOptionPane.ERROR_MESSAGE);
+                 //   int res = JOptionPane.showConfirmDialog(null, jPanel, "Błędne dane. Kliknij OK i spróbuj ponownie", JOptionPane.DEFAULT_OPTION);
                 }
             }
             else if (result == JOptionPane.CLOSED_OPTION) {
@@ -330,6 +331,7 @@ public class Hello extends JFrame {
 
         lab = new JLabel("Wpisz albo wybierz nazwę tabeli którą chcesz zobaczyć: ");
         JLabel lab2=new JLabel("Na skróty: ");
+
         JButton button4 = new JButton("Dostępne samochody");
         //wykonuje zapytanie, a nastepnie je wyswietla
         button4.addActionListener(e -> {
@@ -342,6 +344,95 @@ public class Hello extends JFrame {
                     }
                 }
         );
+
+        /*
+        JButton button6 = new JButton("Średnie ceny w salonach");
+        button6.addActionListener(e -> {
+                    editable=false;
+                    try {
+                        resultSet = statement.executeQuery("SELECT a.miasto as \"salon\", round(avg(cena), 2) as \"średnia cena samochodu\" from salon a join samochody b on a.id_salon=b.id_salon group by a.miasto order by 2");
+                        wypisz();
+                    } catch (SQLException ex){
+                        ex.printStackTrace();
+                    }
+                }
+        );
+
+        JButton button7 = new JButton("Bilans salonów");
+        button7.addActionListener(e -> {
+                    editable=false;
+                    try {
+                        resultSet = statement.executeQuery("SELECT a.id_salon as \"salon\", b.miasto, sum(case when a.sprzedaz='TAK' then a.wartosc_transakcji else -1*wartosc_transakcji end) as \"bilans\" from historia_transakcji a join salon b on a.id_salon = b.id_salon group by a.id_salon, b.miasto order by 3 desc;");
+                        wypisz();
+                    } catch (SQLException ex){
+                        ex.printStackTrace();
+                    }
+                }
+        );
+
+
+        JButton button8 = new JButton("Wartość samochodów w salonach");
+        button8.addActionListener(e -> {
+                    editable=false;
+                    try {
+                        resultSet = statement.executeQuery("SELECT a.id_salon, a.miasto, sum(b.cena) as \"wartosc dostepnych pojazdow\" from salon a join samochody b on a.id_salon = b.id_salon group by a.id_salon, a.miasto order by 3 desc;");
+                        wypisz();
+                    } catch (SQLException ex){
+                        ex.printStackTrace();
+                    }
+                }
+        );
+        */
+
+        JButton button15 = new JButton("Statystyki salonów");
+        button15.addActionListener(e -> {
+                    editable=false;
+                    try {
+                        resultSet = statement.executeQuery("SELECT a.id_salon as \"salon\", b.miasto,sum(case when a.sprzedaz='TAK' then a.wartosc_transakcji else -1*wartosc_transakcji end) as \"bilans\", sum(c.cena) as \"wartosc dostepnych pojazdow\", round(avg(c.cena), 2) as \"srednia cena pojazdu\" from historia_transakcji a right outer join salon b on a.id_salon = b.id_salon left outer join samochody c on b.id_salon=c.id_salon group by a.id_salon, b.miasto order by 3 desc;");
+                        wypisz();
+                    } catch (SQLException ex){
+                        ex.printStackTrace();
+                    }
+                }
+        );
+
+        JButton button9 = new JButton("Doradcy - liczba klientów");
+        button9.addActionListener(e -> {
+                    editable=false;
+                    try {
+                        resultSet = statement.executeQuery("SELECT a.id_salon as \"salon\", a.id_doradcy as \"id_doradcy\", a.imie as \"imie\", a.nazwisko as \"nazwisko\", a.telefon as \"telefon\", count(*) as \"liczba klientow\" from doradcy a join klienci_salonu b on a.id_doradcy = b.id_doradcy group by a.id_doradcy order by 1;");
+                        wypisz();
+                    } catch (SQLException ex){
+                        ex.printStackTrace();
+                    }
+                }
+        );
+
+        JButton button10 = new JButton("Główni partnerzy handlowi");
+        button10.addActionListener(e -> {
+                    editable=false;
+                    try {
+                        resultSet = statement.executeQuery("SELECT b.nazwa as \"firma\", sum(a.wartosc_transakcji) as \"suma transakcji\" from historia_transakcji a join klienci_salonu b on a.id_klienta = b.id_klienta where b.nazwa is not null group by b.nazwa order by 2 desc limit 3; ");
+                        wypisz();
+                    } catch (SQLException ex){
+                        ex.printStackTrace();
+                    }
+                }
+        );
+
+        JButton button11 = new JButton("Liczba posiadanych pojazdów");
+        button11.addActionListener(e -> {
+                    editable=false;
+                    try {
+                        resultSet = statement.executeQuery("SELECT b.nazwa as \"marka\", a.model, count(*) as \"ilość posiadanych pojazdów\" from modele a join marki b on a.id_marka = b.id_marka join samochody c on a.id_model = c.id_model group by b.nazwa, a.id_model, a.model order by 3 desc;");
+                        wypisz();
+                    } catch (SQLException ex){
+                        ex.printStackTrace();
+                    }
+                }
+        );
+
+      //  resultSet = statement.executeQuery();
 
         textArea = new JTextArea(30,40);
         textArea.setEditable(false);
@@ -426,6 +517,7 @@ public class Hello extends JFrame {
                                 resultSet = statement.executeQuery("select * from " + str + " order by 1");
                                 wypisz();
                             } catch (SQLException ex) {
+                                ex.printStackTrace();
                                 String nazwa = ex.getClass().getSimpleName();
                                 String opis = ex.getMessage();
                                 JOptionPane.showMessageDialog(null, "ERROR: Nie można dokonać operacji usunięcia \n" +
@@ -436,16 +528,20 @@ public class Hello extends JFrame {
                             BigDecimal delete;
                             BigDecimal delete2=new BigDecimal("0");
                             delete=(BigDecimal) tableModel.getValueAt(zazn,0);
+                          //  System.out.println(delete);
                             String id = "";
                             String id2 = "";
                             switch (str) {
+                                case "rodzaj_napedu":
+                                    id = "id_naped";
+                                    break;
                                 case "historia_transakcji":
                                     id = "id_transakcji";
                                     break;
                                 case "doradcy":
                                     id = "id_doradcy";
                                     break;
-                                case "kierwonicy":
+                                case "kierownicy":
                                     id = "id_kierownika";
                                     break;
                                 case "salon":
@@ -494,10 +590,12 @@ public class Hello extends JFrame {
 
                             if(!str.equals("modele_kraje")&&!str.equals("modele_wyposazenie")&&!str.equals("modele_naped")&&!str.equals("modele_typ")) {
                                 try {
+                                 //   System.out.println(str);
                                     statement.execute("delete from " + str + " where " + id + "=" + delete);
                                     resultSet = statement.executeQuery("select * from " + str + " order by 1");
                                     wypisz();
                                 } catch (SQLException ex) {
+                                 //   ex.printStackTrace();
                                     String nazwa = ex.getClass().getSimpleName();
                                     String opis = ex.getMessage();
                                     JOptionPane.showMessageDialog(null, "ERROR: Nie można dokonać operacji usunięcia \n" +
@@ -510,6 +608,7 @@ public class Hello extends JFrame {
                                     resultSet = statement.executeQuery("select * from " + str + " order by 1");
                                     wypisz();
                                 } catch (SQLException ex) {
+                                  //  ex.printStackTrace();
                                     String nazwa = ex.getClass().getSimpleName();
                                     String opis = ex.getMessage();
                                     JOptionPane.showMessageDialog(null, "ERROR: Nie można dokonać operacji usunięcia \n" +
@@ -648,6 +747,13 @@ public class Hello extends JFrame {
         //ciekawe zapytania
         add(lab2);
         add(button4);
+      //  add(button6);
+     //   add(button7);
+     //   add(button8);
+        add(button15);
+        add(button10);
+        add(button11);
+        add(button9);
         setVisible(true);
 
         //jak okno zmienia rozmiar to takze tebela zmienia rozmiar
