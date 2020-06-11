@@ -1,3 +1,17 @@
+DROP FUNCTION email_uni() CASCADE;
+DROP FUNCTION KM_kW() CASCADE;
+DROP FUNCTION email_ins() CASCADE;
+DROP FUNCTION email_uni() CASCADE;
+DROP FUNCTION telefon_uni() CASCADE;
+DROP FUNCTION samochod_data() CASCADE;
+DROP FUNCTION samochod_naped() CASCADE;
+DROP FUNCTION samochod_naped() CASCADE;
+DROP FUNCTION samochod_typ() CASCADE;
+DROP FUNCTION samochod_wyposazenie() CASCADE;
+DROP FUNCTION telefon_ins() CASCADE;
+DROP FUNCTION model_wyposazenie() CASCADE;
+DROP FUNCTION uzywany() CASCADE;
+
 DROP TABLE salon_samochody CASCADE;
 DROP TABLE samochody CASCADE;
 DROP TABLE salon CASCADE;
